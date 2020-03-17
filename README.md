@@ -1,6 +1,10 @@
 # socket.io Chat (with AndroidX dependencies)
 
-This is a simple chat demo for socket.io and Android. You can connect to [https://socket-io-chat.now.sh](https://socket-io-chat.now.sh) using this app.
+This is a simple chat demo for socket.io and Android. 
+
+You can connect to [https://socket-io-chat.now.sh](https://socket-io-chat.now.sh) using this app.
+
+It is roughly based upon Naoyuki Kanezawa's [socket.io-android-chat](https://github.com/nkzawa/socket.io-android-chat).
 
 ## Installation
 
