@@ -1,0 +1,45 @@
+apply plugin: "com.android.application"
+apply plugin: "androidx.navigation.safeargs"
+
+android {
+    defaultConfig {
+        applicationId "io.syslogic.socketio"
+        minSdkVersion 19
+        targetSdkVersion 29
+        compileSdkVersion 29
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    implementation "com.google.android.material:material:1.1.0"
+    implementation "androidx.appcompat:appcompat:1.1.0"
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation "androidx.navigation:navigation-fragment:2.2.1"
+    implementation "androidx.navigation:navigation-ui:2.2.1"
+    implementation "androidx.fragment:fragment:1.2.2"
+    debugImplementation "androidx.fragment:fragment-testing:1.2.2"
+    implementation ("io.socket:socket.io-client:1.0.0") {
+        exclude group: "org.json", module: "json"
+    }
+    testImplementation "junit:junit:4.13"
+    androidTestImplementation "androidx.test:core:1.2.0"
+    androidTestImplementation "androidx.test:runner:1.2.0"
+    androidTestImplementation "androidx.test:rules:1.2.0"
+    androidTestImplementation "androidx.test.ext:junit:1.1.1"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
+}

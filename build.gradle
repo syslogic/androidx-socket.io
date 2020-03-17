@@ -1,0 +1,37 @@
+// Top-level build.gradle
+
+// $BUILD_NUMBER exists when building with Jenkins
+project.ext.set('jenkinsBuild', System.getenv("BUILD_NUMBER") ?: "0")
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:3.6.1"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.2.1"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+
+// rootProject > clean
+task clean(type: Delete) {
+    // delete build directories
+    delete rootProject.buildDir
+    delete project.buildDir
+    // when task clean has finished
+    doLast {
+        // recreate APK output directories
+        mkdir("${project.buildDir}/outputs/apk")
+        mkdir("${project.buildDir}/outputs/apk/debug")
+        mkdir("${project.buildDir}/outputs/apk/release")
+    }
+}
