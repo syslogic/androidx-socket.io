@@ -1,4 +1,4 @@
-# socket.io Chat (with AndroidX dependencies)
+# socket.io chat client
 
 This is a simple chat demo for socket.io and Android. 
 
