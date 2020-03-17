@@ -1,0 +1,29 @@
+-verbose
+
+-dontnote android.widget.Space
+-dontnote android.databinding.DataBinderMapper
+-dontnote androidx.appcompat.app.ResourcesFlusher
+-dontnote androidx.appcompat.widget.ViewUtils
+-dontnote androidx.core.app.NotificationManagerCompat
+-dontnote androidx.core.app.ActivityRecreator
+-dontnote androidx.core.app.NotificationCompatJellybean
+-dontnote androidx.core.graphics.TypefaceCompatApi21Impl
+-dontnote androidx.core.graphics.TypefaceCompatApi24Impl
+-dontnote androidx.core.graphics.TypefaceCompatApi26Impl
+-dontnote androidx.core.text.ICUCompat
+-dontnote androidx.core.widget.TextViewCompat$OreoCallback
+-dontnote androidx.transition.GhostViewPlatform
+-dontnote androidx.versionedparcelable.VersionedParcel
+-dontnote androidx.core.view.KeyEventDispatcher
+-keep,includedescriptorclasses class androidx.fragment.app.FragmentContainerView { FragmentContainerView(android.content.Context,android.util.AttributeSet,androidx.fragment.app.FragmentManager); }
+-keep class androidx.core.graphics.PathParser$PathDataNode
+-keep class androidx.recyclerview.widget.**
+
+-dontwarn okio.**
+-dontwarn com.squareup.okhttp3.**
+-keep class com.squareup.okhttp3.** { *; }
+-keep interface com.squareup.okhttp3.** { *; }
+-dontwarn javax.annotation.Nullable
+-dontwarn javax.annotation.ParametersAreNonnullByDefault
+-dontnote okhttp3.internal.tls.TrustRootIndex
+-dontnote okhttp3.internal.platform.**

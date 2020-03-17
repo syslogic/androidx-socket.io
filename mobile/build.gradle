@@ -13,11 +13,26 @@ android {
     }
     buildTypes {
         debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+            jniDebuggable true
+            zipAlignEnabled true
+            renderscriptDebuggable true
+            pseudoLocalesEnabled false
+            shrinkResources false
             minifyEnabled false
         }
         release {
+
+            testCoverageEnabled false
+            zipAlignEnabled true
+            pseudoLocalesEnabled false
+            renderscriptDebuggable false
+            jniDebuggable false
+            debuggable false
             minifyEnabled true
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            shrinkResources true
+            proguardFile "${project.rootDir}/proguard/default.pro"
         }
     }
     dataBinding {

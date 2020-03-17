@@ -21,7 +21,6 @@ allprojects {
     }
 }
 
-
 // rootProject > clean
 task clean(type: Delete) {
     // delete build directories
