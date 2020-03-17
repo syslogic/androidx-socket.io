@@ -1,5 +1,6 @@
 package io.syslogic.socketio;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
@@ -10,16 +11,14 @@ import io.socket.client.Socket;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String CHAT_SERVER_URL = "https://socket-io-chat.now.sh/";
-
     private LiveData<NavController> currentNavController = null;
     private String userName = null;
     private int userCount = 0;
-
     private Socket mSocket;
+
     {
         try {
-            this.mSocket = IO.socket(CHAT_SERVER_URL);
+            this.mSocket = IO.socket(getResources().getString(R.string.chat_server_url));
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
