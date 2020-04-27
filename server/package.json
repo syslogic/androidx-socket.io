@@ -1,0 +1,19 @@
+{
+  "name": "socket.io-chat",
+  "version": "1.0.0",
+  "description": "A simple chat client using socket.io",
+  "main": "index.js",
+  "author": "Grant Timmerman",
+  "private": true,
+  "license": "BSD",
+  "dependencies": {
+    "express": "~4.17.1",
+    "socket.io": "~2.3.0",
+    "bufferutil": "^4.0.1",
+    "utf-8-validate": "^5.0.2"
+  },
+  "scripts": {
+    "build": "npm start",
+    "start": "node index.js"
+  }
+}

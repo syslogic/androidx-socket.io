@@ -1,0 +1,5 @@
+.gradle
+node_modules
+package-lock.json
+build
+*.iml

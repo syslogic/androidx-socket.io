@@ -1,0 +1,99 @@
+import org.gradle.internal.os.OperatingSystem
+
+apply plugin: 'base'
+apply plugin: 'com.moowork.node'
+
+/* https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md */
+node {
+    version = '10.14.1'
+    npmVersion = '6.4.1'
+    distBaseUrl = 'https://nodejs.org/dist'
+    download = true
+}
+
+npm_update {
+    args = ['--production', '--loglevel', 'warn']
+}
+
+npm_run_build {
+    inputs.files fileTree('public')
+    inputs.file 'package.json'
+    inputs.file 'package-lock.json'
+    outputs.dir "build"
+}
+
+// pack output of the build into JAR file
+task packageNpmApp(type: Zip) {
+    dependsOn npm_run_build
+    baseName 'socket.io.chat'
+    extension 'jar'
+    from '.'
+    include 'index.js'
+    include 'package.json'
+    include 'README.md'
+    include 'public/*'
+    destinationDir file("${projectDir}/build")
+}
+
+// declare a dedicated scope for publishing the packaged JAR
+configurations {
+    npmResources
+}
+
+configurations.default.extendsFrom(configurations.npmResources)
+
+// expose the artifact created by the packaging task
+artifacts {
+    npmResources(packageNpmApp.getArchivePath()) {
+        builtBy packageNpmApp
+        type 'jar'
+    }
+}
+
+assemble.dependsOn packageNpmApp
+
+clean {
+    delete packageNpmApp.getArchivePath()
+}
+
+task startServer(type: Exec) {
+    def os = OperatingSystem.current()
+    if (os.isUnix() || os.isLinux() || os.isMacOsX()) {
+        commandLine "scripts/start_server.sh"
+    } else {
+        commandLine "scripts/start_server.bat"
+    }
+    ignoreExitValue = true
+    def stdOut = new ByteArrayOutputStream()
+    def stdErr = new ByteArrayOutputStream()
+    standardOutput stdOut
+    errorOutput stdErr
+    doLast {
+        if(execResult.getExitValue() == 0) {
+            println standardOutput.toString()
+        } else {
+            println stdErr.toString()
+        }
+    }
+}
+
+task stopServer(type: Exec) {
+    def os = OperatingSystem.current()
+    if (os.isUnix() || os.isLinux() || os.isMacOsX()) {
+        commandLine "scripts/stop_server.sh"
+    } else {
+        commandLine "scripts/stop_server.bat"
+    }
+    ignoreExitValue = true
+    def stdOut = new ByteArrayOutputStream()
+    def stdErr = new ByteArrayOutputStream()
+    standardOutput stdOut
+    errorOutput stdErr
+    doLast {
+        if(execResult.getExitValue() == 0) {
+            println standardOutput.toString()
+        } else {
+            println stdErr.toString()
+        }
+    }
+}
