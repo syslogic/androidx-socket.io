@@ -2,6 +2,7 @@ package io.syslogic.socketio;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,6 +72,7 @@ public class LoginFragment extends Fragment {
         mDataBinding.usernameInput.setError(null);
 
         // Check for a valid username
+        assert mDataBinding.usernameInput.getText() != null;
         String username = mDataBinding.usernameInput.getText().toString().trim();
         if (TextUtils.isEmpty(username)) {
             mDataBinding.usernameInput.setError(getString(R.string.error_field_required));
@@ -87,12 +89,14 @@ public class LoginFragment extends Fragment {
     private Emitter.Listener onLogin = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-
             JSONObject data = (JSONObject) args[0];
             int userCount;
+            String socketId;
             try {
                 userCount = data.getInt("numUsers");
+                socketId = data.getString("socketId");
             } catch (JSONException e) {
+                Log.e(LOG_TAG, "" + e.getMessage());
                 return;
             }
 

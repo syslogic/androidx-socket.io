@@ -399,7 +399,7 @@ public class ChatFragment extends Fragment {
     private Runnable onTypingTimeout = new Runnable() {
         @Override
         public void run() {
-            if (!mTyping) return;
+            if (!mTyping) {return;}
             mTyping = false;
             mSocket.emit("stop typing");
         }

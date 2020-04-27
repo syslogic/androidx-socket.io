@@ -66,13 +66,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
 
         void setUsername(String username) {
-            if (null == mUsernameView) return;
+            if (null == mUsernameView) {return;}
             mUsernameView.setText(username);
             mUsernameView.setTextColor(getUsernameColor(username));
         }
 
         void setMessage(String message) {
-            if (null == mMessageView) return;
+            if (null == mMessageView) {return;}
             mMessageView.setText(message);
         }
 
