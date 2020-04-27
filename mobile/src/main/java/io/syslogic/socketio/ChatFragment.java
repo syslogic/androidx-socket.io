@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import io.socket.engineio.client.EngineIOException;
 import io.syslogic.socketio.databinding.FragmentChatBinding;
 
 public class ChatFragment extends Fragment {
@@ -256,8 +257,8 @@ public class ChatFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getActivity(), R.string.disconnect, Toast.LENGTH_LONG).show();
                     Log.i(LOG_TAG, "disconnected");
+                    Toast.makeText(getActivity(), R.string.disconnect, Toast.LENGTH_LONG).show();
                     isConnected = false;
                 }
             });
@@ -268,11 +269,12 @@ public class ChatFragment extends Fragment {
         @Override
         public void call(Object... args) {
             assert getActivity() != null;
+            final EngineIOException e = (EngineIOException) args[0];
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getActivity(), R.string.error_connect, Toast.LENGTH_LONG).show();
-                    Log.e(LOG_TAG, "Error connecting");
+                    Log.e(LOG_TAG, "Error connecting to \"" + Constants.CHAT_SERVER_URL +"\".", e);
+                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
         }

@@ -1,6 +1,5 @@
 package io.syslogic.socketio;
 
-import android.content.res.Resources;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
@@ -16,22 +15,18 @@ public class MainActivity extends AppCompatActivity {
     private int userCount = 0;
     private Socket mSocket;
 
-    {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.fragment_container);
+
         try {
-            this.mSocket = IO.socket(getResources().getString(R.string.chat_server_url));
+            IO.Options opts = new IO.Options();
+            this.mSocket = IO.socket(Constants.CHAT_SERVER_URL, opts);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public Socket getSocket() {
-        return this.mSocket;
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.fragment_container);
     }
 
     @Override
@@ -46,12 +41,19 @@ public class MainActivity extends AppCompatActivity {
     public void setUserName(String value) {
         this.userName = value;
     }
+
     public void setUserCount(int value) {
         this.userCount = value;
     }
+
+    public Socket getSocket() {
+        return this.mSocket;
+    }
+
     public String getUserName() {
         return this.userName;
     }
+
     public int getUserCount() {
         return this.userCount;
     }
