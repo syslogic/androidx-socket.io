@@ -1,23 +1,8 @@
-# socket.io chat client
+# socket.io Chat Server & Client
 
-This is a simple chat demo for socket.io and Android. 
+This is a simple socket.io chat demo for NodeJS and Android. 
 
-You can connect to [https://socket-io-chat.now.sh](https://socket-io-chat.now.sh) using this app.
-
-It is roughly based upon Naoyuki Kanezawa's [socket.io-android-chat](https://github.com/nkzawa/socket.io-android-chat).
-
-## Installation
-
-1. Clone the project.
-2. In Android Studio, chose **File > Import Project** and select the root folder of the project.
-   Android Studio may ask you to choose the type of project you are importing. If this is the case, make sure to choose **Import project from external model** and select the **Gradle** option.
-
-## Tutorial
-
-http://socket.io/blog/native-socket-io-and-android/
-
-## Misc
-https://github.com/socketio/socket.io/issues/2823
+You can connect to [http://192.168.1.1:3000/](http://192.168.1.1:3000) using this app.
 
 ## License
 
