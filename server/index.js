@@ -26,7 +26,7 @@ io.on('connection', (socket) => {
   socket.on('new message', (data) => {
 
     // we tell the client to execute 'new message'
-    console.log('%s wrote: %s', socket.username, data);
+    console.log('user %s wrote: %s', socket.username, data);
     socket.broadcast.emit('new message', {
       username: socket.username,
       message: data
@@ -58,7 +58,6 @@ io.on('connection', (socket) => {
 
   // when the client emits 'typing', we broadcast it to others
   socket.on('typing', () => {
-    console.log('user %s is typing', socket.username);
     socket.broadcast.emit('typing', {
       username: socket.username
     });
@@ -66,7 +65,6 @@ io.on('connection', (socket) => {
 
   // when the client emits 'stop typing', we broadcast it to others
   socket.on('stop typing', () => {
-    console.log('user %s stopped typing', socket.username);
     socket.broadcast.emit('stop typing', {
       username: socket.username
     });
