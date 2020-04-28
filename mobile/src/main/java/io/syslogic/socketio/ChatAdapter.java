@@ -1,6 +1,5 @@
 package io.syslogic.socketio;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -8,9 +7,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
-import io.syslogic.socketio.databinding.CardviewActionBinding;
-import io.syslogic.socketio.databinding.CardviewLogBinding;
-import io.syslogic.socketio.databinding.CardviewMessageBinding;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
@@ -59,7 +55,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         return mMessages.get(position).getType();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         private ViewDataBinding mDataBinding;
 
@@ -69,12 +65,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
 
         void bind(ChatMessage item) {
-            switch(item.getType()) {
-                case ChatMessage.TYPE_MESSAGE: ((CardviewMessageBinding) mDataBinding).setMessage(item); break;
-                case ChatMessage.TYPE_ACTION: ((CardviewActionBinding) mDataBinding).setMessage(item); break;
-                case ChatMessage.TYPE_LOG: ((CardviewLogBinding) mDataBinding).setMessage(item); break;
-            }
-            mDataBinding.executePendingBindings();
+            this.mDataBinding.setVariable(BR.message, item);
+            this.mDataBinding.executePendingBindings();
         }
     }
 }
