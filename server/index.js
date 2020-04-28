@@ -9,7 +9,7 @@ var io = require('socket.io')(server,  {
     path: '/socket.io'
 });
 
-var socket = server.listen(port, () => {
+server.listen(port, () => {
     // console.log('Server listening at port %d', port);
 });
 
@@ -19,6 +19,8 @@ var numUsers = 0;
 io.on('connection', (socket) => {
 
     var addedUser = false;
+
+    socket.join('default');
 
     // when the client emits 'new message', this listens and executes
     socket.on('new message', (data) => {
@@ -39,7 +41,7 @@ io.on('connection', (socket) => {
         numUsers++;
 
         socket.emit('login', {
-            numUsers: numUsers,
+            userCount: numUsers,
             socketId: socket.id
         });
 
@@ -47,7 +49,7 @@ io.on('connection', (socket) => {
         // console.log('user %s has joined; socket %s', socket.username, socket.id);
         socket.broadcast.emit('user joined', {
             username: socket.username,
-            numUsers: numUsers
+            userCount: numUsers
         });
     });
 
@@ -73,7 +75,7 @@ io.on('connection', (socket) => {
             console.log('user %s has left', socket.username);
             socket.broadcast.emit('user left', {
                 username: socket.username,
-                numUsers: numUsers
+                userCount: numUsers
             });
         }
     });

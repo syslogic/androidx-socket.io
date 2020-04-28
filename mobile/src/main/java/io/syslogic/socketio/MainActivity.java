@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
     private String userName = null;
     private int userCount = 0;
     private Socket mSocket;
+    private String currentRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,5 +57,9 @@ public class MainActivity extends AppCompatActivity {
 
     public int getUserCount() {
         return this.userCount;
+    }
+
+    public void setRoom(String value) {
+        this.currentRoom = value;
     }
 }

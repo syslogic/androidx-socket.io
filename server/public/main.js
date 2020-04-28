@@ -10,11 +10,10 @@ $(function() {
   // Initialize variables
   var $window = $(window);
   var $usernameInput = $('.usernameInput'); // Input for username
-  var $messages = $('.messages'); // Messages area
-  var $inputMessage = $('.inputMessage'); // Input message input box
-
-  var $loginPage = $('.login.page'); // The login page
-  var $chatPage = $('.chat.page'); // The chatroom page
+  var $messages = $('.messages');           // Messages area
+  var $inputMessage = $('.inputMessage');   // Input message input box
+  var $loginPage = $('.login.page');        // The login page
+  var $chatPage = $('.chat.page');          // The chatroom page
 
   // Prompt for setting a username
   var username;
@@ -22,15 +21,14 @@ $(function() {
   var typing = false;
   var lastTypingTime;
   var $currentInput = $usernameInput.focus();
-
   var socket = io();
 
   const addParticipantsMessage = (data) => {
     var message = '';
-    if (data.numUsers === 1) {
+    if (data.userCount === 1) {
       message += "there's 1 participant";
     } else {
-      message += "there are " + data.numUsers + " participants";
+      message += "there are " + data.userCount + " participants";
     }
     log(message);
   }
@@ -229,10 +227,8 @@ $(function() {
   socket.on('login', (data) => {
     connected = true;
     // Display the welcome message
-    var message = "Welcome to Socket.IO Chat – ";
-    log(message, {
-      prepend: true
-    });
+    // var message = "Welcome to Socket.IO Chat – ";
+    // log(message, {prepend: true});
     addParticipantsMessage(data);
   });
 
@@ -262,6 +258,10 @@ $(function() {
   // Whenever the server emits 'stop typing', kill the typing message
   socket.on('stop typing', (data) => {
     removeChatTyping(data);
+  });
+
+  socket.on('connect', () => {
+    log('you have been connected');
   });
 
   socket.on('disconnect', () => {

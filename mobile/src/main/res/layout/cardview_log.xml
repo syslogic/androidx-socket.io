@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="message" type="io.syslogic.socketio.ChatMessage"/>
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.MaterialComponents.CardView"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/cardview"
+        android:clickable="true"
+        android:focusable="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/line_padding"
+            android:paddingStart="@dimen/message_padding"
+            android:paddingEnd="@dimen/message_padding">
+
+            <TextView
+                android:id="@+id/message"
+                style="?android:textAppearanceMedium"
+                android:textColor="?android:textColorSecondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="@{message.message}"
+                tools:text="@string/text_message"/>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

@@ -29,8 +29,8 @@ public class LoginFragment extends Fragment {
     public LoginFragment() {}
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, parent, false);
         mDataBinding.usernameInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -58,7 +58,6 @@ public class LoginFragment extends Fragment {
             mSocket.on("login", onLogin);
         }
     }
-
 
     @Override
     public void onDestroy() {
@@ -90,11 +89,11 @@ public class LoginFragment extends Fragment {
         @Override
         public void call(Object... args) {
             JSONObject data = (JSONObject) args[0];
-            int userCount;
-            String socketId;
+            int userCount; String socketId;
             try {
-                userCount = data.getInt("numUsers");
                 socketId = data.getString("socketId");
+                userCount = data.getInt("userCount");
+                Log.d(LOG_TAG, "room " + socketId + " has " + userCount + " participants");
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "" + e.getMessage());
                 return;
@@ -103,9 +102,10 @@ public class LoginFragment extends Fragment {
             if(getActivity() != null) {
                 ((MainActivity) getActivity()).setUserName(mUserName);
                 ((MainActivity) getActivity()).setUserCount(userCount);
+                ((MainActivity) getActivity()).setRoom(socketId);
             }
 
-            /* navigating back */
+            /* navigating upwards */
             if(getView() != null) {
                 Navigation.findNavController(getView()).navigateUp();
             }

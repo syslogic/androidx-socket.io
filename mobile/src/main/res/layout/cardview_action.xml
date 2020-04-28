@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="message" type="io.syslogic.socketio.ChatMessage"/>
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.MaterialComponents.CardView"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/cardview"
+        android:clickable="true"
+        android:focusable="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="@dimen/line_padding"
+            android:paddingStart="@dimen/message_padding"
+            android:paddingEnd="@dimen/message_padding">
+
+            <TextView
+                android:id="@+id/username"
+                style="?android:textAppearanceMedium"
+                android:textColor="?android:textColorPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@{message.username}"
+                tools:text="@string/text_username"
+                tools:textColor="@color/username8"/>
+
+            <TextView
+                android:id="@+id/action"
+                style="?android:textAppearanceMedium"
+                android:textColor="?android:textColorSecondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/action_padding"
+                android:paddingRight="@dimen/action_padding"
+                android:singleLine="true"
+                android:text="@string/user_action_typing"/>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

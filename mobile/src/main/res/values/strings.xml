@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Socket.IO Chat Demo</string>
+
+    <string name="app_name">Socket.IO Chat Client</string>
+
     <string name="title_fragment_login">Join</string>
 
     <!-- Strings related to login -->
     <string name="prompt_username">What\'s your nickname?</string>
     <string name="action_sign_in">Join</string>
     <string name="action_sign_in_short">Join</string>
-
     <string name="error_field_required">This field is required</string>
 
     <string name="action_leave">Leave</string>
@@ -20,12 +21,13 @@
 
     <!-- messages -->
     <string name="message_welcome">Welcome to Socket.IO Chat –</string>
+    <string name="message_user_joined">%s joined</string>
+    <string name="message_user_left">%s left</string>
+    <string name="user_action_typing">is typing</string>
+
     <plurals name="message_participants">
         <item quantity="one">there\'s %d participant</item>
         <item quantity="other">there are %d participants</item>
     </plurals>
-    <string name="message_user_joined">%s joined</string>
-    <string name="message_user_left">%s left</string>
-    <string name="user_action_typing">is typing</string>
 
 </resources>

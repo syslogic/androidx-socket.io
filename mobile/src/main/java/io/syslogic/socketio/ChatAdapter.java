@@ -2,48 +2,51 @@ package io.syslogic.socketio;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.List;
+import java.util.ArrayList;
+import io.syslogic.socketio.databinding.CardviewActionBinding;
+import io.syslogic.socketio.databinding.CardviewLogBinding;
+import io.syslogic.socketio.databinding.CardviewMessageBinding;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
-    private List<ChatMessage> mMessages;
-    private int[] mUsernameColors;
+    private ArrayList<ChatMessage> mMessages;
 
-    ChatAdapter(Context context, List<ChatMessage> messages) {
+    ChatAdapter(ArrayList<ChatMessage> messages) {
         mMessages = messages;
-        mUsernameColors = context.getResources().getIntArray(R.array.username_colors);
     }
 
     @Override
     @NonNull
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        int layout = -1;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        ViewDataBinding binding = null;
         switch (viewType) {
-        case ChatMessage.TYPE_MESSAGE:
-            layout = R.layout.item_message;
-            break;
-        case ChatMessage.TYPE_LOG:
-            layout = R.layout.item_log;
-            break;
-        case ChatMessage.TYPE_ACTION:
-            layout = R.layout.item_action;
-            break;
+            case ChatMessage.TYPE_MESSAGE: {
+                binding = DataBindingUtil.inflate(inflater, R.layout.cardview_message, parent, false);
+                break;
+            }
+            case ChatMessage.TYPE_ACTION: {
+                binding = DataBindingUtil.inflate(inflater, R.layout.cardview_action, parent, false);
+                break;
+            }
+            case ChatMessage.TYPE_LOG: {
+                binding = DataBindingUtil.inflate(inflater, R.layout.cardview_log, parent, false);
+                break;
+            }
         }
-        View v = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
-        return new ViewHolder(v);
+        assert binding != null;
+        return new ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        ChatMessage message = mMessages.get(position);
-        viewHolder.setMessage(message.getMessage());
-        viewHolder.setUsername(message.getUsername());
+        ChatMessage item = mMessages.get(position);
+        viewHolder.bind(item);
     }
 
     @Override
@@ -57,32 +60,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView mUsernameView;
-        private TextView mMessageView;
-        ViewHolder(View itemView) {
-            super(itemView);
-            mUsernameView = itemView.findViewById(R.id.username);
-            mMessageView = itemView.findViewById(R.id.message);
+
+        private ViewDataBinding mDataBinding;
+
+        ViewHolder(ViewDataBinding binding) {
+            super(binding.getRoot());
+            this.mDataBinding = binding;
         }
 
-        void setUsername(String username) {
-            if (null == mUsernameView) {return;}
-            mUsernameView.setText(username);
-            mUsernameView.setTextColor(getUsernameColor(username));
-        }
-
-        void setMessage(String message) {
-            if (null == mMessageView) {return;}
-            mMessageView.setText(message);
-        }
-
-        private int getUsernameColor(String username) {
-            int hash = 7;
-            for (int i = 0, len = username.length(); i < len; i++) {
-                hash = username.codePointAt(i) + (hash << 5) - hash;
+        void bind(ChatMessage item) {
+            switch(item.getType()) {
+                case ChatMessage.TYPE_MESSAGE: ((CardviewMessageBinding) mDataBinding).setMessage(item); break;
+                case ChatMessage.TYPE_ACTION: ((CardviewActionBinding) mDataBinding).setMessage(item); break;
+                case ChatMessage.TYPE_LOG: ((CardviewLogBinding) mDataBinding).setMessage(item); break;
             }
-            int index = Math.abs(hash % mUsernameColors.length);
-            return mUsernameColors[index];
+            mDataBinding.executePendingBindings();
         }
     }
 }

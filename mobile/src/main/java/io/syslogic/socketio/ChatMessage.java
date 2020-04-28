@@ -1,6 +1,8 @@
 package io.syslogic.socketio;
 
-class ChatMessage {
+import android.content.Context;
+
+public class ChatMessage {
 
     static final int TYPE_MESSAGE = 0;
     static final int TYPE_LOG = 1;
@@ -10,21 +12,25 @@ class ChatMessage {
     private String mMessage;
     private String mUsername;
 
-    private ChatMessage() {}
+    private ChatMessage() {
 
-    int getType() {
-        return mType;
+   }
+
+
+    public int getType() {
+        return this.mType;
     }
 
-    String getMessage() {
-        return mMessage;
+    public String getMessage() {
+        return this.mMessage;
     }
 
-    String getUsername() {
-        return mUsername;
+    public String getUsername() {
+        return this.mUsername;
     }
 
     static class Builder {
+
         private final int mType;
         private String mUsername;
         private String mMessage;
@@ -34,20 +40,20 @@ class ChatMessage {
         }
 
         Builder username(String username) {
-            mUsername = username;
+            this.mUsername = username;
             return this;
         }
 
         Builder message(String message) {
-            mMessage = message;
+            this.mMessage = message;
             return this;
         }
 
         ChatMessage build() {
             ChatMessage message = new ChatMessage();
-            message.mType = mType;
-            message.mUsername = mUsername;
-            message.mMessage = mMessage;
+            message.mType = this.mType;
+            message.mUsername = this.mUsername;
+            message.mMessage = this.mMessage;
             return message;
         }
     }

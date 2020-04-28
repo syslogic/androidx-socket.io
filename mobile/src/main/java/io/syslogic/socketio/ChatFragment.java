@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.List;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import io.socket.engineio.client.EngineIOException;
@@ -37,20 +36,22 @@ public class ChatFragment extends Fragment {
     private static final String LOG_TAG = ChatFragment.class.getSimpleName();
     private FragmentChatBinding mDataBinding = null;
     private static final int TYPING_TIMER_LENGTH = 600;
-    private List<ChatMessage> mMessages = new ArrayList<>();
+    private ArrayList<ChatMessage> mMessages = new ArrayList<>();
     private Handler mTypingHandler = new Handler();
     private RecyclerView.Adapter mAdapter;
     private Boolean isConnected = true; // skip the initial "connected" message
     private boolean mTyping = false;
     private String mUsername;
     private Socket mSocket;
+    private int[] mUsernameColors;
 
     public ChatFragment() {}
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        mAdapter = new ChatAdapter(context, mMessages);
+        mAdapter = new ChatAdapter(mMessages);
+        mUsernameColors = context.getResources().getIntArray(R.array.username_colors);
     }
 
     @Override
@@ -88,8 +89,8 @@ public class ChatFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat, parent, false);
         mDataBinding.messageInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int id, KeyEvent event) {
@@ -106,14 +107,13 @@ public class ChatFragment extends Fragment {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (null == mUsername) return;
-                if (!mSocket.connected()) return;
+                if (null == mUsername) {return;}
+                if (!mSocket.connected()) {return;}
 
                 if (!mTyping) {
                     mTyping = true;
                     mSocket.emit("typing");
                 }
-
                 mTypingHandler.removeCallbacks(onTypingTimeout);
                 mTypingHandler.postDelayed(onTypingTimeout, TYPING_TIMER_LENGTH);
             }
@@ -139,8 +139,9 @@ public class ChatFragment extends Fragment {
             if (((MainActivity) getActivity()).getUserName() == null) {
                 startSignIn();
             } else {
-                addLog(getResources().getString(R.string.message_welcome));
-                addParticipantsLog(((MainActivity) getActivity()).getUserCount());
+                // addLog(getResources().getString(R.string.message_welcome));
+                updateUserCount(((MainActivity) getActivity()).getUserCount());
+                mDataBinding.messageInput.requestFocus();
             }
         }
     }
@@ -166,8 +167,17 @@ public class ChatFragment extends Fragment {
         scrollToBottom();
     }
 
-    private void addParticipantsLog(int numUsers) {
+    private void updateUserCount(int numUsers) {
         addLog(getResources().getQuantityString(R.plurals.message_participants, numUsers, numUsers));
+    }
+
+    public int getUsernameColor(String username) {
+        int hash = 7;
+        for (int i = 0, len = username.length(); i < len; i++) {
+            hash = username.codePointAt(i) + (hash << 5) - hash;
+        }
+        int index = Math.abs(hash % mUsernameColors.length);
+        return mUsernameColors[index];
     }
 
     private void addMessage(String username, String message) {
@@ -242,7 +252,6 @@ public class ChatFragment extends Fragment {
                 public void run() {
                     if(! isConnected) {
                         if(mUsername != null) {mSocket.emit("add user", mUsername);}
-                        Toast.makeText(getActivity().getApplicationContext(), R.string.connect, Toast.LENGTH_LONG).show();
                         isConnected = true;
                     }
                 }
@@ -257,8 +266,6 @@ public class ChatFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i(LOG_TAG, "disconnected");
-                    Toast.makeText(getActivity(), R.string.disconnect, Toast.LENGTH_LONG).show();
                     isConnected = false;
                 }
             });
@@ -322,7 +329,7 @@ public class ChatFragment extends Fragment {
                         return;
                     }
                     addLog(getResources().getString(R.string.message_user_joined, username));
-                    addParticipantsLog(numUsers);
+                    updateUserCount(numUsers);
                 }
             });
         }
@@ -345,9 +352,8 @@ public class ChatFragment extends Fragment {
                         Log.e(LOG_TAG, "" + e.getMessage());
                         return;
                     }
-
                     addLog(getResources().getString(R.string.message_user_left, username));
-                    addParticipantsLog(numUsers);
+                    updateUserCount(numUsers);
                     removeTyping(username);
                 }
             });
