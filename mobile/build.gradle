@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:7.0.1"
+        classpath "com.android.tools.build:gradle:7.0.2"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.3.5"
     }
 }
@@ -21,8 +21,8 @@ android {
     defaultConfig {
         applicationId "io.syslogic.socketio"
         minSdkVersion 19
-        targetSdkVersion 30
-        compileSdkVersion 30
+        targetSdkVersion 31
+        compileSdkVersion 31
         versionCode 1
         versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
