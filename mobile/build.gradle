@@ -20,6 +20,7 @@ apply plugin: "androidx.navigation.safeargs"
 android {
     defaultConfig {
         applicationId "io.syslogic.socketio"
+        namespace "io.syslogic.socketio"
         minSdkVersion 19
         targetSdkVersion 33
         compileSdkVersion 33

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="message" type="io.syslogic.socketio.ChatMessage"/>
+        <variable name="item" type="io.syslogic.socketio.ChatMessage"/>
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="start"
-                android:text="@{message.message}"
+                android:text="@{ item.message }"
                 tools:text="@string/text_message"/>
 
         </LinearLayout>
