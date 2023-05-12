@@ -34,14 +34,14 @@ npm_run_build {
 // pack output of the build into JAR file
 task packageNpmApp(type: Zip) {
     dependsOn npm_run_build
-    baseName 'socket.io.chat'
-    extension 'jar'
+    // destinationDir file("${projectDir}/build")
+    // baseName 'socket.io.chat'
+    // extension 'jar'
     from '.'
     include 'index.js'
     include 'package.json'
     include 'README.md'
     include 'public/*'
-    destinationDir file("${projectDir}/build")
 }
 
 // declare a dedicated scope for publishing the packaged JAR
@@ -78,7 +78,7 @@ task startServer(type: Exec) {
     standardOutput stdOut
     errorOutput stdErr
     doLast {
-        if(execResult.getExitValue() == 0) {
+        if (execResult.getExitValue() == 0) {
             println standardOutput.toString()
         } else {
             println stdErr.toString()
