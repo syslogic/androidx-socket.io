@@ -87,7 +87,7 @@ public class LoginFragment extends Fragment {
 
     private Emitter.Listener onLogin = new Emitter.Listener() {
         @Override
-        public void call(Object... args) {
+        public void call(@NonNull Object... args) {
             JSONObject data = (JSONObject) args[0];
             int userCount; String socketId;
             try {

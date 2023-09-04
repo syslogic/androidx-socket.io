@@ -3,8 +3,34 @@
 // $BUILD_NUMBER exists when building with Jenkins
 project.ext.set('jenkinsBuild', System.getenv("BUILD_NUMBER") ?: "0")
 
+/** Modules */
+allprojects {
+
+    /** Runtime JAR files in the classpath should have the same version. */
+    configurations.configureEach {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            def requested = details.requested
+            if (requested.group == 'org.jetbrains.kotlin') {
+                List<String> list = ['kotlin-stdlib', 'kotlin-stdlib-jdk7', 'kotlin-stdlib-jdk8', 'kotlin-stdlib-common']
+                if (list.contains(requested.name)) {
+                    details.useVersion "1.9.0"
+                }
+            }
+        }
+    }
+
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile).tap {
+            configureEach {
+                options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+            }
+        }
+    }
+}
+
+
 // rootProject > clean
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     // delete build directories
     delete rootProject.buildDir
     delete project.buildDir

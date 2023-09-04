@@ -10,11 +10,11 @@ import io.socket.client.Socket;
 
 public class MainActivity extends AppCompatActivity {
 
-    private LiveData<NavController> currentNavController = null;
+    LiveData<NavController> currentNavController = null;
     private String userName = null;
     private int userCount = 0;
     private Socket mSocket;
-    private String currentRoom;
+    String currentRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -40,7 +40,7 @@ public class ChatFragment extends Fragment {
     private static final int TYPING_TIMER_LENGTH = 600;
     private ArrayList<ChatMessage> mMessages = new ArrayList<>();
     private Handler mTypingHandler = new Handler();
-    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.Adapter<?> mAdapter;
     private Boolean isConnected = true; // skip the initial "connected" message
     private boolean mTyping = false;
     private String mUsername;

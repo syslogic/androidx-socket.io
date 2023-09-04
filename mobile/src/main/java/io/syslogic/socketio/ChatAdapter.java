@@ -12,30 +12,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     private ArrayList<ChatMessage> mMessages;
 
-    ChatAdapter(ArrayList<ChatMessage> messages) {
+    ChatAdapter(@NonNull ArrayList<ChatMessage> messages) {
         mMessages = messages;
     }
 
     @Override
     @NonNull
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        ViewDataBinding binding = null;
+        int resId = 0;
         switch (viewType) {
-            case ChatMessage.TYPE_MESSAGE: {
-                binding = DataBindingUtil.inflate(inflater, R.layout.cardview_message, parent, false);
-                break;
-            }
-            case ChatMessage.TYPE_ACTION: {
-                binding = DataBindingUtil.inflate(inflater, R.layout.cardview_action, parent, false);
-                break;
-            }
-            case ChatMessage.TYPE_LOG: {
-                binding = DataBindingUtil.inflate(inflater, R.layout.cardview_log, parent, false);
-                break;
-            }
+            case ChatMessage.TYPE_MESSAGE: {resId = R.layout.cardview_message; break;}
+            case ChatMessage.TYPE_ACTION:  {resId = R.layout.cardview_action; break;}
+            case ChatMessage.TYPE_LOG: {resId = R.layout.cardview_log; break;}
         }
-        assert binding != null;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        ViewDataBinding binding = DataBindingUtil.inflate(inflater, resId, parent, false);
         return new ViewHolder(binding);
     }
 
@@ -59,7 +50,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
         private ViewDataBinding mDataBinding;
 
-        ViewHolder(ViewDataBinding binding) {
+        ViewHolder(@NonNull ViewDataBinding binding) {
             super(binding.getRoot());
             this.mDataBinding = binding;
         }

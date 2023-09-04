@@ -1,7 +1,5 @@
 package io.syslogic.socketio;
 
-import android.content.Context;
-
 public class ChatMessage {
 
     static final int TYPE_MESSAGE = 0;
@@ -14,8 +12,7 @@ public class ChatMessage {
 
     private ChatMessage() {
 
-   }
-
+    }
 
     public int getType() {
         return this.mType;
