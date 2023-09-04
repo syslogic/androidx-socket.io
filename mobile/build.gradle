@@ -13,6 +13,7 @@ android {
         targetSdk 34
         compileSdk 34
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildFeatures {
         buildConfig true
