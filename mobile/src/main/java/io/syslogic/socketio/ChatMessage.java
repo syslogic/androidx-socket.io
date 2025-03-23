@@ -1,27 +1,36 @@
 package io.syslogic.socketio;
 
-public class ChatMessage {
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+
+public class ChatMessage extends BaseObservable {
 
     static final int TYPE_MESSAGE = 0;
-    static final int TYPE_LOG = 1;
-    static final int TYPE_ACTION = 2;
+    static final int TYPE_LOG     = 1;
+    static final int TYPE_ACTION  = 2;
 
     private int mType;
     private String mMessage;
     private String mUsername;
 
-    private ChatMessage() {
+    ChatMessage() {}
 
+    public ChatMessage(int type, String message, String name) {
+        mType = type;
+        mMessage = message;
+        mUsername = name;
     }
 
     public int getType() {
         return this.mType;
     }
 
+    @Bindable
     public String getMessage() {
         return this.mMessage;
     }
 
+    @Bindable
     public String getUsername() {
         return this.mUsername;
     }

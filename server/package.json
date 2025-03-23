@@ -21,7 +21,6 @@
     "utf-8-validate": "^5.0.2"
   },
   "scripts": {
-    "build:js:watch" : "webpack --config=webpack.config.js -w",
     "build": "npm start",
     "start": "node index.js"
   }

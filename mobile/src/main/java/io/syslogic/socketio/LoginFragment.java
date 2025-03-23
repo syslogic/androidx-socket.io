@@ -50,9 +50,7 @@ public class LoginFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (requireActivity() instanceof MainActivity activity) {
             mSocket = activity.getSocket();
-            if (mSocket != null) {
-                mSocket.on("login", onLogin);
-            }
+            mSocket.on("login", onLogin);
         }
     }
 
@@ -60,9 +58,7 @@ public class LoginFragment extends Fragment {
     public void onDestroy() {
         if (requireActivity() instanceof MainActivity activity) {
             mSocket = activity.getSocket();
-            if (mSocket != null) {
-                mSocket.off("login", onLogin);
-            }
+            mSocket.off("login", onLogin);
         }
         super.onDestroy();
     }
@@ -86,7 +82,10 @@ public class LoginFragment extends Fragment {
         if (mSocket != null && mSocket.connected()) {
             mSocket.emit("add user", username);
         } else {
-            Log.e(LOG_TAG, "login attempt: socket not connected");
+            String message = "socket not connected";
+            mDataBinding.usernameInput.setError(message);
+            Log.e(LOG_TAG, message);
+
         }
     }
 
@@ -108,11 +107,13 @@ public class LoginFragment extends Fragment {
                 activity.setUserName(mUserName);
                 activity.setUserCount(userCount);
                 activity.setRoom(socketId);
-            }
 
-            /* navigate upwards */
-            if (getView() != null) {
-                Navigation.findNavController(getView()).navigateUp();
+                /* navigate upwards */
+                if (getView() != null) {
+                    activity.runOnUiThread(() ->
+                            Navigation.findNavController(getView()).navigateUp()
+                    );
+                }
             }
         }
     };

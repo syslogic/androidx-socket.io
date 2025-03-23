@@ -3,6 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/fragment_login">
 
+    <data/>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -11,7 +13,7 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin">
 
-        <LinearLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -38,7 +40,8 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/action_sign_in"
                 android:textStyle="bold"/>
-        </LinearLayout>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </ScrollView>
 </layout>

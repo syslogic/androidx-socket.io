@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="message" type="io.syslogic.socketio.ChatMessage"/>
+        <variable name="item" type="io.syslogic.socketio.ChatMessage"/>
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -15,7 +15,7 @@
         android:clickable="true"
         android:focusable="true">
 
-        <LinearLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -24,18 +24,18 @@
             android:paddingStart="@dimen/message_padding"
             android:paddingEnd="@dimen/message_padding">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/username"
                 style="?android:textAppearanceMedium"
                 android:textColor="?android:textColorPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:text="@{message.username}"
+                android:text="@{ item.username }"
                 tools:text="@string/text_username"
                 tools:textColor="@color/username8"/>
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/action"
                 style="?android:textAppearanceMedium"
                 android:textColor="?android:textColorSecondary"
@@ -46,7 +46,7 @@
                 android:singleLine="true"
                 android:text="@string/user_action_typing"/>
 
-        </LinearLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </com.google.android.material.card.MaterialCardView>
 

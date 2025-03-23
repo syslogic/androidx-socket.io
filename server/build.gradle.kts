@@ -1,14 +1,11 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+
 import org.gradle.internal.os.OperatingSystem
+
 import java.io.ByteArrayOutputStream
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import com.github.gradle.node.npm.task.NpmInstallTask
 import com.github.gradle.node.npm.task.NpmTask
-import com.github.gradle.node.npm.task.NpxTask
-import com.github.gradle.node.task.NodeTask
-import org.jetbrains.kotlin.gradle.targets.js.npm.tasks.KotlinNpmInstallTask
-import org.jetbrains.kotlin.gradle.utils.extendsFrom
+
 import kotlin.apply
 
 plugins {
@@ -24,14 +21,12 @@ node {
 }
 
 // Register NpmTask that will do what "npm run build" command does.
-val npmRunUpdateTask = tasks.named("npm_update", NpmTask::class.java) {
-    // npmCommand.apply { listOf<String>("update") }
+tasks.named("npm_update", NpmTask::class.java) {
     args.apply { listOf<String>("--omit", "dev", "--loglevel", "warn") }
 }
 
 // Register NpmTask that will do what "npm run build" command does.
 val npmRunBuildTask = tasks.named("npm_run_build", NpmTask::class.java) {
-    // npmCommand.apply { listOf<String>("build") }
     outputs.upToDateWhen { file("${projectDir}/build").exists() }
     inputs.files(fileTree("public"))
     inputs.file("package.json")
@@ -50,11 +45,11 @@ val packageNpmApp = tasks.register("packageNpmApp", Zip::class.java) {
     include("public/*")
 }
 
-// declare a dedicated scope for publishing the packaged JAR
+// Declare a dedicated scope for publishing the packaged JAR
 val npmResources: Configuration? by configurations.creating
 configurations.default.get().extendsFrom(npmResources)
 
-// expose the artifact created by the packaging task
+// Expose the artifact created by the packaging task
 artifacts {
     npmResources.apply {
         add("archives", packageNpmApp) {
@@ -71,18 +66,18 @@ tasks.named("clean") {
 }
 
 tasks.register("startServer", Exec::class.java) {
-    isIgnoreExitValue = true
+    val os: OperatingSystem = OperatingSystem.current()
     val stdOut = ByteArrayOutputStream()
     val stdErr = ByteArrayOutputStream()
+    isIgnoreExitValue = true
     standardOutput = stdOut
     errorOutput = stdErr
 
-    val os: OperatingSystem = OperatingSystem.current()
-    commandLine("scripts/start_server" +
-            if (os.isUnix || os.isLinux || os.isMacOsX) {".sh"}
-            else {".bat"}
-    )
-
+    if (os.isUnix || os.isLinux || os.isMacOsX) {
+        commandLine(rootProject.file("server/scripts").absoluteFile.path + "/start_server.sh")
+    } else {
+        commandLine("cmd", "/c", "pwsh -File " + rootProject.file("server/scripts").absoluteFile.path + "/start_server.ps1")
+    }
     doLast {
         if (executionResult.get().exitValue == 0) {
             println(standardOutput.toString())
@@ -93,17 +88,18 @@ tasks.register("startServer", Exec::class.java) {
 }
 
 tasks.register("stopServer", Exec::class.java) {
-    isIgnoreExitValue = true
+    val os: OperatingSystem = OperatingSystem.current()
     val stdOut = ByteArrayOutputStream()
     val stdErr = ByteArrayOutputStream()
+    isIgnoreExitValue = true
     standardOutput = stdOut
     errorOutput = stdErr
 
-    val os: OperatingSystem = OperatingSystem.current()
-    commandLine("scripts/stop_server" +
-            if (os.isUnix || os.isLinux || os.isMacOsX) {".sh"}
-            else {".bat"}
-    )
+    if (os.isUnix || os.isLinux || os.isMacOsX) {
+        commandLine(rootProject.file("server/scripts").absoluteFile.path + "/stop_server.sh")
+    } else {
+        commandLine("cmd", "/c", "pwsh -File " + rootProject.file("server/scripts").absoluteFile.path + "/stop_server.ps1")
+    }
 
     doLast {
         if (executionResult.get().exitValue == 0) {

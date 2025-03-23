@@ -6,12 +6,6 @@
     app:startDestination="@id/mainFragment">
 
     <fragment
-        android:id="@+id/loginFragment"
-        android:name="io.syslogic.socketio.LoginFragment"
-        android:label="@string/app_name"
-        tools:layout="@layout/fragment_login"/>
-
-    <fragment
         android:id="@+id/mainFragment"
         android:name="io.syslogic.socketio.ChatFragment"
         android:label="@string/app_name"
@@ -20,5 +14,11 @@
             android:id="@+id/action_chatFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="io.syslogic.socketio.LoginFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_login"/>
 
 </navigation>

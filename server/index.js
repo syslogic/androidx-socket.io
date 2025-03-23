@@ -10,7 +10,7 @@ var io = require('socket.io')(server,  {
 });
 
 server.listen(port, () => {
-    // console.log('Server listening at port %d', port);
+    console.log('Server listening at port %d', port);
 });
 
 // Chatroom
@@ -45,8 +45,8 @@ io.on('connection', (socket) => {
             socketId: socket.id
         });
 
-        // echo globally that a user has connected
-        // console.log('user %s has joined; socket %s', socket.username, socket.id);
+        // broadcast that a user has connected
+        console.log('user %s has joined; socket %s', socket.username, socket.id);
         socket.broadcast.emit('user joined', {
             username: socket.username,
             userCount: numUsers

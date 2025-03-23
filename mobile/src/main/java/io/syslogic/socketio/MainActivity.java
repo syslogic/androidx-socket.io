@@ -2,6 +2,7 @@ package io.syslogic.socketio;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 
 public class MainActivity extends AppCompatActivity {
+
     @NonNull final static String LOG_TAG = MainActivity.class.getSimpleName();
     LiveData<NavController> currentNavController = null;
     private String userName = null;
@@ -43,13 +45,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (this.mSocket == null) {this.initSocket();}
         this.getOnBackPressedDispatcher().addCallback(this.navigateOnBackPressed);
         this.setContentView(R.layout.fragment_container);
+    }
+
+    public void initSocket() {
         try {
-            IO.Options opts = new IO.Options();
-            this.mSocket = IO.socket(Constants.CHAT_SERVER_URL, opts);
+            this.mSocket = IO.socket(getServerUrl(), /* getSocketIoOptions() */ new IO.Options() );
         } catch (URISyntaxException e) {
-            Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
+            // throw new RuntimeException(e);
+            String message = Objects.requireNonNull(e.getMessage());
+            Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+            Log.e(LOG_TAG, message);
         }
     }
 
@@ -61,6 +69,11 @@ public class MainActivity extends AppCompatActivity {
         this.userCount = value;
     }
 
+    public void setRoom(String value) {
+        this.currentRoom = value;
+    }
+
+    @NonNull
     public Socket getSocket() {
         return this.mSocket;
     }
@@ -73,7 +86,9 @@ public class MainActivity extends AppCompatActivity {
         return this.userCount;
     }
 
-    public void setRoom(String value) {
-        this.currentRoom = value;
+    @NonNull
+    private String getServerUrl() {
+        return getString(R.string.server_transport) + "://" + getString(R.string.server_hostname) + ":" +
+                getResources().getInteger(R.integer.server_port) + getResources().getString(R.string.server_path);
     }
 }

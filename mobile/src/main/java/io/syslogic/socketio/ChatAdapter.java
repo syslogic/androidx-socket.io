@@ -4,48 +4,54 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
-    @NonNull final static String LOG_TAG = ChatAdapter.class.getSimpleName();
-    private ArrayList<ChatMessage> mMessages = new ArrayList<>();
+import io.syslogic.socketio.databinding.CardviewActionBinding;
+import io.syslogic.socketio.databinding.CardviewLogBinding;
+import io.syslogic.socketio.databinding.CardviewMessageBinding;
 
-    public ChatAdapter(@NonNull ArrayList<ChatMessage> messages) {
-        mMessages = messages;
+public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
+    private final ArrayList<ChatMessage> mItems;
+
+    public ChatAdapter(@NonNull ArrayList<ChatMessage> items) {
+        mItems = items;
     }
 
     @Override
     public int getItemCount() {
-        return mMessages.size();
+        return mItems.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return mMessages.get(position).getType();
+        return getItem(position).getType();
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        int resId = 0;
-        switch (viewType) {
-            case ChatMessage.TYPE_MESSAGE: {resId = R.layout.cardview_message; break;}
-            case ChatMessage.TYPE_ACTION:  {resId = R.layout.cardview_action; break;}
-            case ChatMessage.TYPE_LOG: {resId = R.layout.cardview_log; break;}
-        }
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        ViewDataBinding binding = DataBindingUtil.inflate(inflater, resId, parent, false);
-        return new ViewHolder(binding);
+        return switch (viewType) {
+            case ChatMessage.TYPE_LOG ->
+                    new ViewHolder(CardviewLogBinding.inflate(inflater, parent, false));
+            case ChatMessage.TYPE_ACTION ->
+                    new ViewHolder(CardviewActionBinding.inflate(inflater, parent, false));
+            /* case ChatMessage.TYPE_MESSAGE */ default ->
+                    new ViewHolder(CardviewMessageBinding.inflate(inflater, parent, false));
+        };
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        ChatMessage item = mMessages.get(position);
+        ChatMessage item = getItem(position);
         viewHolder.bind(item);
+    }
+
+    private ChatMessage getItem(int position) {
+        return mItems.get(position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -58,7 +64,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
 
         void bind(ChatMessage item) {
-            this.mDataBinding.setVariable(BR.message, item);
+            if (this.mDataBinding instanceof CardviewMessageBinding binding) {
+                binding.setItem(item);
+            } else if (this.mDataBinding instanceof CardviewLogBinding binding) {
+                binding.setItem(item);
+            } else if (this.mDataBinding instanceof CardviewActionBinding binding) {
+                binding.setItem(item);
+            }
             this.mDataBinding.executePendingBindings();
         }
     }

@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Connection (debug) -->
+    <string name="server_transport">http</string>
+    <string name="server_hostname">192.168.2.96</string>
+    <integer name="server_port">3000</integer>
+    <string name="server_path">/</string>
+
 </resources>
