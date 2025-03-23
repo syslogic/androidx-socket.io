@@ -3,13 +3,12 @@ package io.syslogic.socketio;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -34,12 +34,11 @@ import io.socket.engineio.client.EngineIOException;
 import io.syslogic.socketio.databinding.FragmentChatBinding;
 
 public class ChatFragment extends Fragment {
-
     private static final String LOG_TAG = ChatFragment.class.getSimpleName();
     private FragmentChatBinding mDataBinding = null;
     private static final int TYPING_TIMER_LENGTH = 600;
-    private ArrayList<ChatMessage> mMessages = new ArrayList<>();
-    private Handler mTypingHandler = new Handler();
+    private final ArrayList<ChatMessage> mMessages = new ArrayList<>();
+    private final Handler mTypingHandler = new Handler(Looper.getMainLooper());
     private RecyclerView.Adapter<?> mAdapter;
     private Boolean isConnected = true; // skip the initial "connected" message
     private boolean mTyping = false;
@@ -59,56 +58,58 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setHasOptionsMenu(true);
-        if(savedInstanceState == null && getActivity() != null) {
-            mSocket = ((MainActivity) getActivity()).getSocket();
-            mSocket.on(Socket.EVENT_CONNECT, onConnect);
-            mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
-            mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
-            mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
-            mSocket.on("new message", onNewMessage);
-            mSocket.on("user joined", onUserJoined);
-            mSocket.on("user left", onUserLeft);
-            mSocket.on("typing", onTyping);
-            mSocket.on("stop typing", onStopTyping);
-            mSocket.connect();
+        requireActivity().addMenuProvider(new ChatMenuProvider());
+        if (savedInstanceState == null && requireActivity() instanceof MainActivity activity) {
+            mSocket = activity.getSocket();
+            if (mSocket != null) {
+                mSocket.on(Socket.EVENT_CONNECT, onConnect);
+                mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
+                mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
+                mSocket.on("new message", onNewMessage);
+                mSocket.on("user joined", onUserJoined);
+                mSocket.on("user left", onUserLeft);
+                mSocket.on("typing", onTyping);
+                mSocket.on("stop typing", onStopTyping);
+                mSocket.connect();
+            }
         }
     }
 
     @Override
     public void onDestroy() {
-        mSocket.disconnect();
-        mSocket.off(Socket.EVENT_CONNECT, onConnect);
-        mSocket.off(Socket.EVENT_DISCONNECT, onDisconnect);
-        mSocket.off(Socket.EVENT_CONNECT_ERROR, onConnectError);
-        mSocket.off(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
-        mSocket.off("new message", onNewMessage);
-        mSocket.off("user joined", onUserJoined);
-        mSocket.off("user left", onUserLeft);
-        mSocket.off("typing", onTyping);
-        mSocket.off("stop typing", onStopTyping);
+        if (mSocket != null) {
+            mSocket.disconnect();
+            mSocket.off(Socket.EVENT_CONNECT, onConnect);
+            mSocket.off(Socket.EVENT_DISCONNECT, onDisconnect);
+            mSocket.off(Socket.EVENT_CONNECT_ERROR, onConnectError);
+            mSocket.off("new message", onNewMessage);
+            mSocket.off("user joined", onUserJoined);
+            mSocket.off("user left", onUserLeft);
+            mSocket.off("typing", onTyping);
+            mSocket.off("stop typing", onStopTyping);
+        }
         super.onDestroy();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat, parent, false);
-        mDataBinding.messageInput.setOnEditorActionListener((view, id, event) -> {
+
+        this.mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat, parent, false);
+        this.mDataBinding.messageInput.setOnEditorActionListener((view, id, event) -> {
             if (id == R.id.send_button || id == EditorInfo.IME_NULL) {
                 attemptSend();
                 return true;
             }
             return false;
         });
-        mDataBinding.messageInput.addTextChangedListener(new TextWatcher() {
+
+        this.mDataBinding.messageInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (null == mUsername) {return;}
                 if (!mSocket.connected()) {return;}
-
                 if (!mTyping) {
                     mTyping = true;
                     mSocket.emit("typing");
@@ -117,32 +118,29 @@ public class ChatFragment extends Fragment {
                 mTypingHandler.postDelayed(onTypingTimeout, TYPING_TIMER_LENGTH);
             }
             @Override
-            public void afterTextChanged(Editable s) {
-            }
+            public void afterTextChanged(Editable s) {}
         });
-        mDataBinding.sendButton.setOnClickListener(view -> attemptSend());
-        return mDataBinding.getRoot();
+
+        this.mDataBinding.sendButton.setOnClickListener(view -> attemptSend());
+
+        return this.mDataBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mDataBinding.messages.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mDataBinding.messages.setAdapter(mAdapter);
-        if(getActivity() != null) {
-            if (((MainActivity) getActivity()).getUserName() == null) {
+        this.mDataBinding.messages.setLayoutManager(new LinearLayoutManager(getActivity()));
+        this.mDataBinding.messages.setAdapter(mAdapter);
+
+        if (requireActivity() instanceof MainActivity activity) {
+            if (activity.getUserName() == null) {
                 startSignIn();
             } else {
                 // addLog(getResources().getString(R.string.message_welcome));
-                updateUserCount(((MainActivity) getActivity()).getUserCount());
-                mDataBinding.messageInput.requestFocus();
+                updateUserCount(activity.getUserCount());
+                this.mDataBinding.messageInput.requestFocus();
             }
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main, menu);
     }
 
     @Override
@@ -162,7 +160,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void updateUserCount(int numUsers) {
-        addLog(getResources().getQuantityString(R.plurals.message_participants, numUsers, numUsers));
+        addLog(getResources().getQuantityString(R.plurals.message_participants, numUsers));
     }
 
     @SuppressWarnings("unused")
@@ -207,13 +205,13 @@ public class ChatFragment extends Fragment {
 
         mTyping = false;
 
-        String message = mDataBinding.messageInput.getText().toString().trim();
+        String message = this.mDataBinding.messageInput.getText().toString().trim();
         if (TextUtils.isEmpty(message)) {
-            mDataBinding.messageInput.requestFocus();
+            this.mDataBinding.messageInput.requestFocus();
             return;
         }
 
-        mDataBinding.messageInput.setText("");
+        this.mDataBinding.messageInput.setText("");
         addMessage(mUsername, message);
 
         // perform the sending message attempt
@@ -227,7 +225,7 @@ public class ChatFragment extends Fragment {
         }
     }
 
-    private void leave() {
+    public void leave() {
         mUsername = null;
         mSocket.disconnect();
         mSocket.connect();
@@ -235,14 +233,13 @@ public class ChatFragment extends Fragment {
     }
 
     private void scrollToBottom() {
-        mDataBinding.messages.scrollToPosition(mAdapter.getItemCount() - 1);
+        this.mDataBinding.messages.scrollToPosition(mAdapter.getItemCount() - 1);
     }
 
     private final Emitter.Listener onConnect = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            assert getActivity() != null;
-            getActivity().runOnUiThread(() -> {
+            requireActivity().runOnUiThread(() -> {
                 if(! isConnected) {
                     if(mUsername != null) {mSocket.emit("add user", mUsername);}
                     isConnected = true;
@@ -252,22 +249,19 @@ public class ChatFragment extends Fragment {
     };
 
     private final Emitter.Listener onDisconnect = args -> {
-        assert getActivity() != null;
-        getActivity().runOnUiThread(() -> isConnected = false);
+        requireActivity().runOnUiThread(() -> isConnected = false);
     };
 
     private final Emitter.Listener onConnectError = args -> {
-        assert getActivity() != null;
         final EngineIOException e = (EngineIOException) args[0];
-        getActivity().runOnUiThread(() -> {
+        requireActivity().runOnUiThread(() -> {
             Log.e(LOG_TAG, "Error connecting to \"" + Constants.CHAT_SERVER_URL +"\".", e);
             Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
         });
     };
 
     private final Emitter.Listener onNewMessage = args -> {
-        assert getActivity() != null;
-        getActivity().runOnUiThread(() -> {
+        requireActivity().runOnUiThread(() -> {
             JSONObject data = (JSONObject) args[0];
             String username;
             String message;
@@ -275,7 +269,7 @@ public class ChatFragment extends Fragment {
                 username = data.getString("username");
                 message = data.getString("message");
             } catch (JSONException e) {
-                Log.e(LOG_TAG, "" + e.getMessage());
+                Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
                 return;
             }
             removeTyping(username);
@@ -284,8 +278,7 @@ public class ChatFragment extends Fragment {
     };
 
     private final Emitter.Listener onUserJoined = args -> {
-        assert getActivity() != null;
-        getActivity().runOnUiThread(() -> {
+        requireActivity().runOnUiThread(() -> {
             JSONObject data = (JSONObject) args[0];
             String username;
             int numUsers;
@@ -293,7 +286,7 @@ public class ChatFragment extends Fragment {
                 username = data.getString("username");
                 numUsers = data.getInt("numUsers");
             } catch (JSONException e) {
-                Log.e(LOG_TAG, "" + e.getMessage());
+                Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
                 return;
             }
             addLog(getResources().getString(R.string.message_user_joined, username));
@@ -302,8 +295,7 @@ public class ChatFragment extends Fragment {
     };
 
     private final Emitter.Listener onUserLeft = args -> {
-        assert getActivity() != null;
-        getActivity().runOnUiThread(() -> {
+        requireActivity().runOnUiThread(() -> {
             JSONObject data = (JSONObject) args[0];
             String username;
             int numUsers;
@@ -311,7 +303,7 @@ public class ChatFragment extends Fragment {
                 username = data.getString("username");
                 numUsers = data.getInt("numUsers");
             } catch (JSONException e) {
-                Log.e(LOG_TAG, "" + e.getMessage());
+                Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
                 return;
             }
             addLog(getResources().getString(R.string.message_user_left, username));
@@ -321,14 +313,13 @@ public class ChatFragment extends Fragment {
     };
 
     private final Emitter.Listener onTyping = args -> {
-        assert getActivity() != null;
-        getActivity().runOnUiThread(() -> {
+        requireActivity().runOnUiThread(() -> {
             JSONObject data = (JSONObject) args[0];
             String username;
             try {
                 username = data.getString("username");
             } catch (JSONException e) {
-                Log.e(LOG_TAG, "" + e.getMessage());
+                Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
                 return;
             }
             addTyping(username);
@@ -336,14 +327,13 @@ public class ChatFragment extends Fragment {
     };
 
     private final Emitter.Listener onStopTyping = args -> {
-        assert getActivity() != null;
-        getActivity().runOnUiThread(() -> {
+        requireActivity().runOnUiThread(() -> {
             JSONObject data = (JSONObject) args[0];
             String username;
             try {
                 username = data.getString("username");
             } catch (JSONException e) {
-                Log.e(LOG_TAG, "" + e.getMessage());
+                Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
                 return;
             }
             removeTyping(username);

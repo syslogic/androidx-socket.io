@@ -1,18 +1,27 @@
 {
   "name": "socket.io-chat",
-  "version": "1.0.0",
   "description": "A simple chat client using socket.io",
-  "main": "index.js",
-  "author": "Grant Timmerman",
+  "version": "1.0.0",
   "private": true,
   "license": "BSD",
+  "main": "index.js",
+  "contributors": [{
+    "name": "Grant Timmerman",
+    "email": "grant@users.noreply.github.com",
+    "url": "https://github.com/grant"
+  }, {
+    "name": "Martin Zeitler",
+    "email": "syslogic@users.noreply.github.com",
+    "url": "https://github.com/syslogic"
+  }],
   "dependencies": {
     "bufferutil": "^4.0.1",
-    "express": "~4.17.1",
-    "socket.io": "^2.4.1",
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1",
     "utf-8-validate": "^5.0.2"
   },
   "scripts": {
+    "build:js:watch" : "webpack --config=webpack.config.js -w",
     "build": "npm start",
     "start": "node index.js"
   }

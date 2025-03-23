@@ -1,0 +1,59 @@
+[versions]
+app_versionCode              = "1"
+app_versionName              = "1.0.0"
+android_buildTools           = "35.0.0"
+android_compileSdk           = "35"
+android_targetSdk            = "35"
+android_minSdk               = "24"
+
+kotlin                       = "2.1.20"
+android_gradle_plugin        = "8.9.0"
+androidx_navigation          = "2.8.9"
+androidx_appcompat           = "1.7.0"
+androidx_fragment            = "1.8.6"
+material_design              = "1.12.0"
+nodejs                       = "7.1.0"
+junit                        = "4.13.2"
+androidx_recyclerview        = "1.4.0"
+socket_io_client             = "2.1.2"
+
+#noinspection GradleDependency
+androidx_test_core           = "1.5.0"
+#noinspection GradleDependency
+androidx_test_junit          = "1.1.5"
+#noinspection GradleDependency
+androidx_test_rules          = "1.5.0"
+#noinspection GradleDependency
+androidx_test_runner         = "1.5.2"
+#noinspection GradleDependency
+androidx_test_espresso       = "3.5.1"
+
+[plugins]
+android_application          = { id = "com.android.application", version.ref = "android_gradle_plugin" }
+android_library              = { id = "com.android.library", version.ref = "android_gradle_plugin" }
+androidx_navigation_safeargs = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidx_navigation" }
+kotlin_android               = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+nodejs                       = { id = "com.github.node-gradle.node", version.ref = "nodejs" }
+
+[libraries]
+socket_io_client             = { module = "io.socket:socket.io-client", version.ref = "socket_io_client" }
+material_design              = { module = "com.google.android.material:material", version.ref = "material_design" }
+androidx_appcompat           = { module = "androidx.appcompat:appcompat", version.ref = "androidx_appcompat" }
+androidx_fragment            = { module = "androidx.fragment:fragment", version.ref = "androidx_fragment" }
+androidx_fragment_testing    = { module = "androidx.fragment:fragment-testing", version.ref = "androidx_fragment" }
+androidx_navigation_fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "androidx_navigation" }
+androidx_navigation_ui       = { module = "androidx.navigation:navigation-ui", version.ref = "androidx_navigation" }
+androidx_navigation_testing  = { module = "androidx.navigation:navigation-testing", version.ref = "androidx_navigation" }
+androidx_recyclerview        = { module = "androidx.recyclerview:recyclerview", version.ref = "androidx_recyclerview" }
+
+junit                        = { module = "junit:junit", version.ref = "junit" }
+androidx_test_core           = { module = "androidx.test:core", version.ref = "androidx_test_core" }
+androidx_test_junit          = { module = "androidx.test.ext:junit", version.ref = "androidx_test_junit" }
+androidx_test_rules          = { module = "androidx.test:rules", version.ref = "androidx_test_rules" }
+androidx_test_runner         = { module = "androidx.test:runner", version.ref = "androidx_test_runner" }
+androidx_test_espresso_core  = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx_test_espresso" }
+
+[bundles]
+androidx                     = [ "androidx_appcompat", "androidx_fragment", "androidx_navigation_fragment", "androidx_navigation_ui", "androidx_recyclerview" ]
+androidx_testing             = [ "androidx_navigation_testing", "androidx_fragment_testing" ]
+androidx_test                = [ "androidx_test_core", "androidx_test_junit", "androidx_test_rules", "androidx_test_runner", "androidx_test_espresso_core" ]

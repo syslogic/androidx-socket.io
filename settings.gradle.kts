@@ -1,6 +1,5 @@
 import org.gradle.api.initialization.resolve.RepositoriesMode
 
-// settings.gradle
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -9,6 +8,7 @@ pluginManagement {
     }
 }
 
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
@@ -19,5 +19,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "socket.io"
 
-include ':mobile'
-include ':server'
+include(":mobile")
+include(":server")

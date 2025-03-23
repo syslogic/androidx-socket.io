@@ -2,22 +2,34 @@ package io.syslogic.socketio;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
+    @NonNull final static String LOG_TAG = ChatAdapter.class.getSimpleName();
+    private ArrayList<ChatMessage> mMessages = new ArrayList<>();
 
-    private ArrayList<ChatMessage> mMessages;
-
-    ChatAdapter(@NonNull ArrayList<ChatMessage> messages) {
+    public ChatAdapter(@NonNull ArrayList<ChatMessage> messages) {
         mMessages = messages;
     }
 
     @Override
+    public int getItemCount() {
+        return mMessages.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return mMessages.get(position).getType();
+    }
+
     @NonNull
+    @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         int resId = 0;
         switch (viewType) {
@@ -31,24 +43,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         ChatMessage item = mMessages.get(position);
         viewHolder.bind(item);
     }
 
-    @Override
-    public int getItemCount() {
-        return mMessages.size();
-    }
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-    @Override
-    public int getItemViewType(int position) {
-        return mMessages.get(position).getType();
-    }
-
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private ViewDataBinding mDataBinding;
+        private final ViewDataBinding mDataBinding;
 
         ViewHolder(@NonNull ViewDataBinding binding) {
             super(binding.getRoot());
