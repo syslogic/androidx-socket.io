@@ -35,8 +35,8 @@
     <string name="user_action_typing">is typing</string>
 
     <plurals name="message_participants">
-        <item quantity="zero">There are no participants</item>
         <item quantity="one">There\'s %d participant</item>
+        <item quantity="zero">There are no participants</item>
         <item quantity="other">There are %d participants</item>
     </plurals>
 

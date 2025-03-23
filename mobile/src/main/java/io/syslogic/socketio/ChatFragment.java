@@ -142,7 +142,8 @@ public class ChatFragment extends Fragment {
     }
 
     private void updateUserCount(int numUsers) {
-        addLog(getResources().getQuantityString(R.plurals.message_participants, numUsers, numUsers));
+        String message = getResources().getQuantityString(R.plurals.message_participants, numUsers, numUsers);
+        addLog(message);
     }
 
     @SuppressWarnings("unused")
