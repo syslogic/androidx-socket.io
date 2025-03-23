@@ -1,6 +1,7 @@
 package io.syslogic.socketio;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -38,11 +39,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (this.mSocket == null) {this.initSocket();}
@@ -54,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
         try {
             this.mSocket = IO.socket(getServerUrl(), /* getSocketIoOptions() */ new IO.Options() );
         } catch (URISyntaxException e) {
-            // throw new RuntimeException(e);
             String message = Objects.requireNonNull(e.getMessage());
             Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             Log.e(LOG_TAG, message);
@@ -88,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
 
     @NonNull
     private String getServerUrl() {
-        return getString(R.string.server_transport) + "://" + getString(R.string.server_hostname) + ":" +
-                getResources().getInteger(R.integer.server_port) + getResources().getString(R.string.server_path);
+        return getString(R.string.server_transport) + "://" + getString(R.string.server_hostname) +
+                ":" + getResources().getInteger(R.integer.server_port) +
+                getResources().getString(R.string.server_path);
     }
 }

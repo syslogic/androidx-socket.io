@@ -1,6 +1,8 @@
 package io.syslogic.socketio;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.preference.PreferenceManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +37,11 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, parent, false);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        String username = prefs.getString("username", null);
+        if (username != null) {mDataBinding.usernameInput.setText(username);}
+
         mDataBinding.usernameInput.setOnEditorActionListener((textView, id, keyEvent) -> {
             if (id == R.id.sign_in_button || id == EditorInfo.IME_NULL) {
                 attemptLogin();
@@ -42,6 +50,7 @@ public class LoginFragment extends Fragment {
             return false;
         });
         mDataBinding.signInButton.setOnClickListener(view -> attemptLogin());
+
         return mDataBinding.getRoot();
     }
 
@@ -71,6 +80,8 @@ public class LoginFragment extends Fragment {
         // Check for a valid username
         assert mDataBinding.usernameInput.getText() != null;
         String username = mDataBinding.usernameInput.getText().toString().trim();
+        mDataBinding.usernameInput.setText(username); // trimmed.
+
         if (TextUtils.isEmpty(username)) {
             mDataBinding.usernameInput.setError(getString(R.string.error_field_required));
             mDataBinding.usernameInput.requestFocus();
@@ -80,12 +91,16 @@ public class LoginFragment extends Fragment {
         // perform the login attempt
         mUserName = username;
         if (mSocket != null && mSocket.connected()) {
+
             mSocket.emit("add user", username);
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+            prefs.edit().putString("username", username).apply();
+
         } else {
             String message = "socket not connected";
             mDataBinding.usernameInput.setError(message);
             Log.e(LOG_TAG, message);
-
         }
     }
 
