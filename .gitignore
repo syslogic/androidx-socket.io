@@ -49,3 +49,7 @@ lint/tmp/
 # lint/reports/
 
 *.iml
+/server/.idea/workspace.xml
+/server/.idea/php.xml
+/server/.idea/modules.xml
+/server/.idea/misc.xml
