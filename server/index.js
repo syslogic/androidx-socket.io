@@ -13,7 +13,7 @@ var server = require('http').createServer(app);
 // });
 
 server.listen(port, () => {
-    console.log('Listing at port %d', port);
+    console.log('Listening at port %d', port);
 });
 
 var io = require('socket.io')(server,  {

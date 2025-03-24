@@ -21,7 +21,7 @@ public class MainActivityTest extends BaseActivityTest {
 
     /**
      * Initialize the {@link ActivityScenario} with the {@link MainActivity}.
-     * @noinspection Convert2MethodRef
+     * @noinspection Convert2MethodRef, CodeBlock2Expr
      */
     @Before
     public void setupTest() {

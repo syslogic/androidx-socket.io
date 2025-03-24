@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -184,6 +183,7 @@ public class ChatFragment extends BaseFragment {
 
         mTyping = false;
         if (!mSocket.connected()) {return;}
+        Log.d(LOG_TAG, "attempt message send");
         String message = Objects.requireNonNull(this.mDataBinding.inputMessage.getText()).toString().trim();
         if (TextUtils.isEmpty(message)) {
             this.mDataBinding.inputMessage.requestFocus();

@@ -10,14 +10,13 @@ import androidx.core.view.MenuProvider;
 import java.lang.ref.WeakReference;
 
 import io.syslogic.socketio.R;
-import io.syslogic.socketio.activity.BaseActivity;
 import io.syslogic.socketio.activity.MainActivity;
 
 public class ChatMenuProvider implements MenuProvider {
 
-    private final WeakReference<BaseActivity> mContext;
+    private final WeakReference<MainActivity> mContext;
 
-    public ChatMenuProvider(BaseActivity activity) {
+    public ChatMenuProvider(MainActivity activity) {
         this.mContext = new WeakReference<>(activity);
     }
 
@@ -29,7 +28,7 @@ public class ChatMenuProvider implements MenuProvider {
     @Override
     public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.action_leave) {
-            BaseActivity activity = mContext.get();
+            MainActivity activity = mContext.get();
             activity.getNavController().navigateUp();
             return true;
         }

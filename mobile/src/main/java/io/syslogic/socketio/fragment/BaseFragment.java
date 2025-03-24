@@ -11,6 +11,7 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import io.socket.engineio.client.EngineIOException;
 
+import io.syslogic.socketio.R;
 import io.syslogic.socketio.activity.MainActivity;
 
 public class BaseFragment extends Fragment {
@@ -47,7 +48,7 @@ public class BaseFragment extends Fragment {
 
         if (requireActivity() instanceof MainActivity activity) {
             // final EngineIOException e = (EngineIOException) args[0];
-            final String message = "Error connecting to " + activity.getServerUrl();
+            final String message = "Error connecting " +  getString(R.string.server_hostname) + ":" + getResources().getInteger(R.integer.server_port);
             activity.runOnUiThread(() -> {
 
                 Log.e(LOG_TAG, message);

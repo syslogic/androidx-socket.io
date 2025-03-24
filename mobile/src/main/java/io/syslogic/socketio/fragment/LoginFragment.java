@@ -81,6 +81,10 @@ public class LoginFragment extends BaseFragment {
 
     private void attemptLogin() {
 
+        // add the emitter, before logging in.
+        mSocket.on("login", this.onLogin);
+        Log.d(LOG_TAG, "attempt login");
+
         AppCompatEditText inputUsername = this.mDataBinding.inputUsername;
 
         // Reset errors.
@@ -125,19 +129,31 @@ public class LoginFragment extends BaseFragment {
                 this.mDataBinding.setConnection(socketId);
                 this.mDataBinding.executePendingBindings();
                 if (activity.getCurrentFragment() instanceof LoginFragment) {
-                    activity.getNavController().navigate(R.id.action_loginFragment_to_chatFragment, navArgs);
+                    try {
+                        activity.getNavController().navigate(
+                                R.id.action_loginFragment_to_chatFragment,
+                                navArgs
+                        );
+                    }
+                    catch (IllegalArgumentException ignore) {}
                 }
             });
         }
     }
 
     protected final Emitter.Listener onLogin = args -> {
+
         JSONObject data = (JSONObject) args[0];
         try {
             String socketId = data.getString("socketId");
             String usercount = String.valueOf(data.getInt("usercount"));
             Log.d(LOG_TAG, "room " + socketId + " has " + usercount + " participants");
+
             this.gotoChatFragment(socketId, this.username, Integer.parseInt(usercount));
+
+            // remove the emitter, else it will login endlessly.
+            mSocket.off("login", this.onLogin);
+
         } catch (JSONException e) {
             Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
         }
