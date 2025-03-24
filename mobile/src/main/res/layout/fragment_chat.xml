@@ -3,16 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_main">
 
-    <data/>
+    <data>
+        <variable name="item" type="io.syslogic.socketio.model.ChatRoom"/>
+    </data>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="io.syslogic.socketio.ChatFragment">
+        tools:context="io.syslogic.socketio.fragment.ChatFragment">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/messages"
+            android:id="@+id/recyclerview_messages"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -41,7 +43,7 @@
                 android:inputType="text"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:importantForAutofill="no" />
+                android:importantForAutofill="no"/>
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/send_button"

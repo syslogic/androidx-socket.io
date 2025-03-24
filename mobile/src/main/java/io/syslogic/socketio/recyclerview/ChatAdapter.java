@@ -1,4 +1,4 @@
-package io.syslogic.socketio;
+package io.syslogic.socketio.recyclerview;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import io.syslogic.socketio.databinding.CardviewActionBinding;
 import io.syslogic.socketio.databinding.CardviewLogBinding;
 import io.syslogic.socketio.databinding.CardviewMessageBinding;
+import io.syslogic.socketio.model.ChatMessage;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     private final ArrayList<ChatMessage> mItems;

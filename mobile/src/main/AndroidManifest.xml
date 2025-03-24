@@ -17,13 +17,16 @@
         tools:ignore="AllowBackup">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Required for implicit deep-linking content. -->
+            <nav-graph android:value="@navigation/nav_graph"/>
 
         </activity>
 

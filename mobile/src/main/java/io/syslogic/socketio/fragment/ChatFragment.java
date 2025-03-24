@@ -1,4 +1,4 @@
-package io.syslogic.socketio;
+package io.syslogic.socketio.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,12 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,55 +25,44 @@ import java.util.Objects;
 
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
-import io.socket.engineio.client.EngineIOException;
-import io.syslogic.socketio.databinding.FragmentChatBinding;
 
-public class ChatFragment extends Fragment {
+import io.syslogic.socketio.R;
+import io.syslogic.socketio.activity.MainActivity;
+import io.syslogic.socketio.databinding.FragmentChatBinding;
+import io.syslogic.socketio.model.ChatMessage;
+import io.syslogic.socketio.model.ChatRoom;
+import io.syslogic.socketio.recyclerview.ChatAdapter;
+
+public class ChatFragment extends BaseFragment {
     private static final String LOG_TAG = ChatFragment.class.getSimpleName();
     private FragmentChatBinding mDataBinding = null;
     private static final int TYPING_TIMER_LENGTH = 600;
     private final ArrayList<ChatMessage> mMessages = new ArrayList<>();
     private final Handler mTypingHandler = new Handler(Looper.getMainLooper());
     private RecyclerView.Adapter<?> mAdapter;
-    private Boolean isConnected = true; // skip the initial "connected" message
     private boolean mTyping = false;
-    private String mUsername;
-    private Socket mSocket;
     private int[] mUsernameColors;
-
-    public ChatFragment() {}
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        mAdapter = new ChatAdapter(mMessages);
+        mAdapter = new ChatAdapter(this.mMessages);
         mUsernameColors = context.getResources().getIntArray(R.array.username_colors);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requireActivity().addMenuProvider(new ChatMenuProvider());
-        if (savedInstanceState == null && requireActivity() instanceof MainActivity activity) {
-            mSocket = activity.getSocket();
-            mSocket.on(Socket.EVENT_CONNECT, onConnect);
-            mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
-            mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
-            mSocket.on("new message", onNewMessage);
-            mSocket.on("user joined", onUserJoined);
-            mSocket.on("user left", onUserLeft);
-            mSocket.on("typing", onTyping);
-            mSocket.on("stop typing", onStopTyping);
-            mSocket.connect();
+        if (requireActivity() instanceof MainActivity activity) {
+            activity.addChatMenuProvider();
         }
     }
 
     @Override
     public void onDestroy() {
-        mSocket.disconnect();
-        mSocket.off(Socket.EVENT_CONNECT, onConnect);
-        mSocket.off(Socket.EVENT_DISCONNECT, onDisconnect);
-        mSocket.off(Socket.EVENT_CONNECT_ERROR, onConnectError);
+        mSocket.off(Socket.EVENT_CONNECT, this.onConnect);
+        mSocket.off(Socket.EVENT_DISCONNECT, this.onDisconnect);
+        mSocket.off(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
         mSocket.off("new message", onNewMessage);
         mSocket.off("user joined", onUserJoined);
         mSocket.off("user left", onUserLeft);
@@ -88,8 +73,8 @@ public class ChatFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        this.mDataBinding = FragmentChatBinding.inflate(inflater, parent, false);
 
-        this.mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat, parent, false);
         this.mDataBinding.messageInput.setOnEditorActionListener((view, id, event) -> {
             if (id == R.id.send_button || id == EditorInfo.IME_NULL) {
                 attemptSend();
@@ -103,7 +88,6 @@ public class ChatFragment extends Fragment {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (null == mUsername) {return;}
                 if (!mSocket.connected()) {return;}
                 if (!mTyping) {
                     mTyping = true;
@@ -115,33 +99,67 @@ public class ChatFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
         this.mDataBinding.sendButton.setOnClickListener(view -> attemptSend());
+
         return this.mDataBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.mDataBinding.messages.setLayoutManager(new LinearLayoutManager(getActivity()));
-        this.mDataBinding.messages.setAdapter(mAdapter);
+
+        this.mDataBinding.recyclerviewMessages.setLayoutManager(new LinearLayoutManager(getActivity()));
+        this.mDataBinding.recyclerviewMessages.setAdapter(mAdapter);
+
+        if (savedInstanceState == null) {
+            Bundle args = requireArguments();
+            String socketId = args.getString("socketId", null);
+            String username = args.getString("username", null);
+            int userCount = args.getInt("userCount", 0);
+
+            ChatRoom item = new ChatRoom.Builder()
+                    .socketId(socketId)
+                    .username(username)
+                    .userCount(userCount)
+                    .build();
+
+            this.mDataBinding.setItem(item);
+        }
+
         if (requireActivity() instanceof MainActivity activity) {
+
+            mSocket = activity.getSocket();
+            mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
+            mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
+            mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
+            mSocket.on("new message", onNewMessage);
+            mSocket.on("user joined", onUserJoined);
+            mSocket.on("user left", onUserLeft);
+            mSocket.on("typing", onTyping);
+            mSocket.on("stop typing", onStopTyping);
+            if (! mSocket.connected()) {mSocket.connect();}
+
             if (activity.getUserName() == null) {
-                startSignIn();
+                startSignIn(activity);
             } else {
                 // addLog(getResources().getString(R.string.message_welcome));
-                updateUserCount(activity.getUserCount());
+                addUserCount(getUserCount());
                 this.mDataBinding.messageInput.requestFocus();
             }
         }
     }
 
-    private void addLog(String message) {
-        mMessages.add(new ChatMessage.Builder(ChatMessage.TYPE_LOG).message(message).build());
-        mAdapter.notifyItemInserted(mMessages.size() - 1);
-        scrollToBottom();
+    private int getUserCount() {
+        // return this.mDataBinding.getItem().getUserCount();
+        if (requireActivity() instanceof MainActivity activity) {
+            return activity.getUserCount();
+        } else {
+            return 0;
+        }
     }
 
-    private void updateUserCount(int numUsers) {
+    private void addUserCount(int numUsers) {
         String message = getResources().getQuantityString(R.plurals.message_participants, numUsers, numUsers);
         addLog(message);
     }
@@ -156,23 +174,29 @@ public class ChatFragment extends Fragment {
         return mUsernameColors[index];
     }
 
-    private void addMessage(String username, String message) {
-        mMessages.add(new ChatMessage.Builder(ChatMessage.TYPE_MESSAGE).username(username).message(message).build());
+    private void addItem(ChatMessage item) {
+        this.mMessages.add(item);
         mAdapter.notifyItemInserted(mMessages.size() - 1);
         scrollToBottom();
+    }
+
+    private void addLog(String message) {
+        addItem(new ChatMessage.Builder(ChatMessage.TYPE_LOG).message(message).build());
+    }
+
+    private void addMessage(String username, String message) {
+        addItem(new ChatMessage.Builder(ChatMessage.TYPE_MESSAGE).username(username).message(message).build());
     }
 
     private void addTyping(String username) {
-        mMessages.add(new ChatMessage.Builder(ChatMessage.TYPE_ACTION).username(username).build());
-        mAdapter.notifyItemInserted(mMessages.size() - 1);
-        scrollToBottom();
+        addItem(new ChatMessage.Builder(ChatMessage.TYPE_ACTION).username(username).build());
     }
 
     private void removeTyping(String username) {
-        for (int i = mMessages.size() - 1; i >= 0; i--) {
+        for (int i = this.mMessages.size() - 1; i >= 0; i--) {
             ChatMessage message = mMessages.get(i);
             if (message.getType() == ChatMessage.TYPE_ACTION && message.getUsername().equals(username)) {
-                mMessages.remove(i);
+                this.mMessages.remove(i);
                 mAdapter.notifyItemRemoved(i);
             }
         }
@@ -180,77 +204,44 @@ public class ChatFragment extends Fragment {
 
     private void attemptSend() {
 
-        if (mUsername == null && getActivity() != null) {
-            mUsername = ((MainActivity) getActivity()).getUserName();
+        if (requireActivity() instanceof MainActivity activity) {
+
+            if (activity.getUserName() == null) {return;}
+            if (!mSocket.connected()) {return;}
+
+            mTyping = false;
+
+            String message = Objects.requireNonNull(this.mDataBinding.messageInput.getText()).toString().trim();
+            if (TextUtils.isEmpty(message)) {
+                this.mDataBinding.messageInput.requestFocus();
+                return;
+            }
+
+            this.mDataBinding.messageInput.setText("");
+            addMessage(activity.getUserName(), message);
+
+            // perform the sending message attempt
+            mSocket.emit("new message", message);
         }
-        if (mUsername == null) {return;}
-        if (!mSocket.connected()) {return;}
-
-        mTyping = false;
-
-        String message = Objects.requireNonNull(this.mDataBinding.messageInput.getText()).toString().trim();
-        if (TextUtils.isEmpty(message)) {
-            this.mDataBinding.messageInput.requestFocus();
-            return;
-        }
-
-        this.mDataBinding.messageInput.setText("");
-        addMessage(mUsername, message);
-
-        // perform the sending message attempt
-        mSocket.emit("new message", message);
     }
 
-    private void startSignIn() {
-        mUsername = null;
-        if (getView() != null) {
-            Navigation.findNavController(getView()).navigate(R.id.action_chatFragment_to_loginFragment);
-        }
+    private void startSignIn(@NonNull MainActivity activity) {
+        activity.setUserName(null);
+        activity.getNavController().navigateUp();
     }
 
     /** TODO ... */
-    public void leaveRoom() {
-        mUsername = null;
+    public void leaveRoom(@NonNull MainActivity activity) {
         if (mSocket != null) {
             mSocket.disconnect();
             mSocket.connect();
         }
-        startSignIn();
+        startSignIn(activity);
     }
 
     private void scrollToBottom() {
-        this.mDataBinding.messages.scrollToPosition(mAdapter.getItemCount() - 1);
+        this.mDataBinding.recyclerviewMessages.scrollToPosition(mAdapter.getItemCount() - 1);
     }
-
-    private final Emitter.Listener onConnect = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            requireActivity().runOnUiThread(() -> {
-                if(! isConnected) {
-                    isConnected = true;
-                }
-                if (mUsername != null) {
-                    mSocket.emit("add user", mUsername);
-                }
-            });
-        }
-    };
-
-    private final Emitter.Listener onDisconnect = args -> {
-        requireActivity().runOnUiThread(() -> isConnected = false);
-    };
-
-    /** On {@link EngineIOException} */
-    private final Emitter.Listener onConnectError = args -> {
-        final EngineIOException e = (EngineIOException) args[0];
-        requireActivity().runOnUiThread(() -> {
-            Throwable cause = Objects.requireNonNull(e.getCause());
-            String message = Objects.requireNonNull(cause.getMessage());
-            Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
-            Log.e(LOG_TAG, "Error connecting to \"" + getString(R.string.server_hostname) + "\".");
-            Log.e(LOG_TAG, message);
-        });
-    };
 
     private final Emitter.Listener onNewMessage = args -> {
         requireActivity().runOnUiThread(() -> {
@@ -282,7 +273,7 @@ public class ChatFragment extends Fragment {
                 return;
             }
             addLog(getResources().getString(R.string.message_user_joined, username));
-            updateUserCount(numUsers);
+            addUserCount(numUsers);
         });
     };
 
@@ -300,7 +291,7 @@ public class ChatFragment extends Fragment {
             }
             addLog(getResources().getString(R.string.message_user_left, username));
             removeTyping(username);
-            updateUserCount(numUsers);
+            addUserCount(numUsers);
         });
     };
 
@@ -332,12 +323,9 @@ public class ChatFragment extends Fragment {
         });
     };
 
-    private final Runnable onTypingTimeout = new Runnable() {
-        @Override
-        public void run() {
-            if (! mTyping) {return;}
-            mTyping = false;
-            mSocket.emit("stop typing");
-        }
+    private final Runnable onTypingTimeout = () -> {
+        if (! mTyping) {return;}
+        mTyping = false;
+        mSocket.emit("stop typing");
     };
 }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="item" type="io.syslogic.socketio.ChatMessage"/>
+        <variable name="item" type="io.syslogic.socketio.model.ChatMessage"/>
     </data>
 
     <com.google.android.material.card.MaterialCardView

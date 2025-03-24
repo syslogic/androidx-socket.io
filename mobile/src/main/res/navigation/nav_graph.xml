@@ -1,0 +1,29 @@
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@+id/loginFragment"
+    app:defaultNavHost="true">
+
+    <fragment
+        android:label="LoginFragment"
+        android:id="@+id/loginFragment"
+        android:name="io.syslogic.socketio.fragment.LoginFragment"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_chatFragment"
+            app:destination="@id/chatFragment"/>
+    </fragment>
+
+    <fragment
+        android:label="ChatFragment"
+        android:id="@+id/chatFragment"
+        android:name="io.syslogic.socketio.fragment.ChatFragment"
+        tools:layout="@layout/fragment_chat">
+        <argument android:name="socketId" android:defaultValue="@null" app:nullable="true" app:argType="string"/>
+        <argument android:name="username" android:defaultValue="@null" app:nullable="true" app:argType="string"/>
+        <argument android:name="userCount" android:defaultValue="0" app:argType="integer"/>
+    </fragment>
+
+</navigation>
