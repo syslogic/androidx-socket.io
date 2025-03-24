@@ -53,3 +53,4 @@ lint/tmp/
 /server/.idea/php.xml
 /server/.idea/modules.xml
 /server/.idea/misc.xml
+/server/.idea/jsLibraryMappings.xml

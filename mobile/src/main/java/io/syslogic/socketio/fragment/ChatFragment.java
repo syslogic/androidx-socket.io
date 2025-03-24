@@ -41,12 +41,6 @@ public class ChatFragment extends BaseFragment {
     private boolean mTyping = false;
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        mAdapter = new ChatAdapter(this.mItems);
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (requireActivity() instanceof MainActivity activity) {
@@ -56,11 +50,12 @@ public class ChatFragment extends BaseFragment {
                 mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
                 mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
                 mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-                mSocket.on("new message", onNewMessage);
-                mSocket.on("user joined", onUserJoined);
-                mSocket.on("user left", onUserLeft);
-                mSocket.on("typing", onTyping);
-                mSocket.on("stop typing", onStopTyping);
+                mSocket.on("new message", this.onNewMessage);
+                mSocket.on("private message", this.onPrivateMessage);
+                mSocket.on("user joined", this.onUserJoined);
+                mSocket.on("user left", this.onUserLeft);
+                mSocket.on("typing", this.onTyping);
+                mSocket.on("stop typing", this.onStopTyping);
                 if (!mSocket.connected()) {mSocket.connect();}
             }
         }
@@ -71,16 +66,23 @@ public class ChatFragment extends BaseFragment {
         mSocket.off(Socket.EVENT_CONNECT, this.onConnect);
         mSocket.off(Socket.EVENT_DISCONNECT, this.onDisconnect);
         mSocket.off(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-        mSocket.off("new message", onNewMessage);
-        mSocket.off("user joined", onUserJoined);
-        mSocket.off("user left", onUserLeft);
-        mSocket.off("typing", onTyping);
-        mSocket.off("stop typing", onStopTyping);
+        mSocket.off("new message", this.onNewMessage);
+        mSocket.off("private message", this.onPrivateMessage);
+        mSocket.off("user joined", this.onUserJoined);
+        mSocket.off("user left", this.onUserLeft);
+        mSocket.off("typing", this.onTyping);
+        mSocket.off("stop typing", this.onStopTyping);
 
         if (requireActivity() instanceof MainActivity activity) {
             leaveRoom(activity);
         }
         super.onDestroy();
+    }
+    
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.mAdapter = new ChatAdapter(context, this.mItems);
     }
 
     @Override
@@ -229,6 +231,10 @@ public class ChatFragment extends BaseFragment {
         }
         removeTyping(username);
         addMessage(username, message);
+    });
+
+    private final Emitter.Listener onPrivateMessage = args -> requireActivity().runOnUiThread(() -> {
+
     });
 
     private final Emitter.Listener onUserJoined = args -> requireActivity().runOnUiThread(() -> {

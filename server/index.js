@@ -1,34 +1,29 @@
-var path = require('path');
-var express = require('express');
-var port = process.env.PORT || 3000;
+const path = require('path');
+const express = require('express');
+const port = process.env.PORT || 3000;
 
-var app = express();
+const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
-var server = require('http').createServer(app);
-
-// Close the server if listening doesn't fail
-// server.once('listening', function() {
-    // console.log('Closing port %d...', port);
-    // server.close();
-// });
+const server = require('http').createServer(app);
+const io = require('socket.io') (server, {
+    transports: ['polling', 'websocket'],
+    path: '/socket.io'
+});
 
 server.listen(port, () => {
     console.log('Listening at port %d', port);
 });
 
-var io = require('socket.io')(server,  {
-    transports: ['polling', 'websocket'],
-    path: '/socket.io'
-});
-
 // Chatroom
-var numUsers = 0;
+let numUsers = 0;
 
+// On connection ...
 io.on('connection', (socket) => {
 
-    var addedUser = false;
-
+    console.log('new client has connected from %s', socket.address);
     socket.join('default');
+
+    let addedUser = false;
 
     // when the client emits 'new message', this listens and executes
     socket.on('new message', (data) => {
@@ -37,6 +32,10 @@ io.on('connection', (socket) => {
             username: socket.username,
             message: data
         });
+    });
+
+    socket.on("private message", (anotherSocketId, message) => {
+        socket.to(anotherSocketId).emit("private message", socket.id, message);
     });
 
     // when the client emits 'add user', this listens and executes

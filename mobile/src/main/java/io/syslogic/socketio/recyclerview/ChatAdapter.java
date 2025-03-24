@@ -1,5 +1,6 @@
 package io.syslogic.socketio.recyclerview;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -17,7 +18,7 @@ import io.syslogic.socketio.model.ChatMessage;
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     private final ArrayList<ChatMessage> mItems;
 
-    public ChatAdapter(@NonNull ArrayList<ChatMessage> items) {
+    public ChatAdapter(Context context, @NonNull ArrayList<ChatMessage> items) {
         mItems = items;
     }
 
