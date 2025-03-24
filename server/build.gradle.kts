@@ -10,7 +10,7 @@ import kotlin.apply
 
 plugins {
     id("base")
-    id("com.github.node-gradle.node")
+    alias(libs.plugins.nodejs)
 }
 
 node {
@@ -20,21 +20,28 @@ node {
     download = true
 }
 
-// Register NpmTask that will do what "npm run build" command does.
+/** Configure NpmTask. */
 tasks.named("npm_update", NpmTask::class.java) {
     args.apply { listOf<String>("--omit", "dev", "--loglevel", "warn") }
 }
 
-// Register NpmTask that will do what "npm run build" command does.
+/** Configure NpmTask. */
 val npmRunBuildTask = tasks.named("npm_run_build", NpmTask::class.java) {
     outputs.upToDateWhen { file("${projectDir}/build").exists() }
+    outputs.dir("build")
+
+    // npmCommand.set(listOf<String>("run", "build"))
+    // println(npmCommand.get().joinToString(", "))
+
+    // args.apply { listOf<String>("--loglevel=debug") }
+    // println(args.get().joinToString(", "))
+
     inputs.files(fileTree("public"))
     inputs.file("package.json")
     inputs.file("package-lock.json")
-    outputs.dir("build")
 }
 
-// pack output of the build into JAR file
+/** Package output of the build into JAR file. */
 val packageNpmApp = tasks.register("packageNpmApp", Zip::class.java) {
     dependsOn(npmRunBuildTask)
     destinationDirectory = file("${projectDir}/build")

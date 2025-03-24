@@ -7,12 +7,12 @@ public class ChatRoom extends BaseObservable {
 
     private final String socketId;
     private final String username;
-    private final int userCount;
+    private final int usercount;
 
     public ChatRoom(String socketId, String username, int userCount) {
         this.socketId = socketId;
         this.username = username;
-        this.userCount = userCount;
+        this.usercount = userCount;
     }
 
     @Bindable
@@ -24,31 +24,31 @@ public class ChatRoom extends BaseObservable {
         return this.username;
     }
     @Bindable
-    public int getUserCount() {
-        return this.userCount;
+    public int getUsercount() {
+        return this.usercount;
     }
 
     public static class Builder {
         private String socketId;
         private String username;
-        private int userCount;
+        private int usercount;
 
-        public Builder socketId(String socketId) {
-            this.socketId = socketId;
+        public Builder setSocketId(String value) {
+            this.socketId = value;
             return this;
         }
-        public Builder username(String username) {
-            this.username = username;
+        public Builder setUsername(String value) {
+            this.username = value;
             return this;
         }
 
-        public Builder userCount(int userCount) {
-            this.userCount = userCount;
+        public Builder setUsercount(int value) {
+            this.usercount = value;
             return this;
         }
 
         public ChatRoom build() {
-            return new ChatRoom(this.socketId, this.username, this.userCount);
+            return new ChatRoom(this.socketId, this.username, this.usercount);
         }
     }
 }

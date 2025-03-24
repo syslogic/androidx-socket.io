@@ -3,7 +3,6 @@ package io.syslogic.socketio.fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +13,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.preference.PreferenceManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Objects;
+
 import io.socket.client.Socket;
 
+import io.socket.emitter.Emitter;
 import io.syslogic.socketio.R;
 import io.syslogic.socketio.activity.MainActivity;
 import io.syslogic.socketio.databinding.FragmentLoginBinding;
@@ -25,31 +30,9 @@ public class LoginFragment extends BaseFragment {
     private FragmentLoginBinding mDataBinding = null;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        this.mDataBinding = FragmentLoginBinding.inflate(inflater, parent, false);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        this.mDataBinding.usernameInput.setOnEditorActionListener((textView, id, keyEvent) -> {
-            if (id == R.id.sign_in_button || id == EditorInfo.IME_NULL) {
-                this.attemptLogin();
-                return true;
-            }
-            return false;
-        });
-
-        //noinspection CodeBlock2Expr
-        this.mDataBinding.signInButton.setOnClickListener(view -> {
-            this.attemptLogin();
-        });
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
-        String username = prefs.getString("username", null);
-        if (username != null) {this.mDataBinding.usernameInput.setText(username);}
-        return this.mDataBinding.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         if (requireActivity() instanceof MainActivity activity) {
             activity.removeMenuProvider();
             mSocket = activity.getSocket();
@@ -62,33 +45,59 @@ public class LoginFragment extends BaseFragment {
     }
 
     @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        this.mDataBinding = FragmentLoginBinding.inflate(inflater, parent, false);
+
+        this.mDataBinding.inputUsername.setOnEditorActionListener((textView, id, keyEvent) -> {
+            if (id == R.id.button_sign_in || id == EditorInfo.IME_NULL) {
+                this.attemptLogin();
+                return true;
+            }
+            return false;
+        });
+
+        //noinspection CodeBlock2Expr
+        this.mDataBinding.buttonSignIn.setOnClickListener(view -> {
+            this.attemptLogin();
+        });
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        String username = prefs.getString("username", null);
+        if (username != null) {this.mDataBinding.inputUsername.setText(username);}
+
+        return this.mDataBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
     public void onDestroy() {
-        if (requireActivity() instanceof MainActivity activity) {
-            mSocket = activity.getSocket();
-            mSocket.off(Socket.EVENT_CONNECT, this.onConnect);
-            mSocket.off(Socket.EVENT_DISCONNECT, this.onDisconnect);
-            mSocket.off(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-            mSocket.off("login", this.onLogin);
-        }
+        mSocket.off(Socket.EVENT_CONNECT, this.onConnect);
+        mSocket.off(Socket.EVENT_DISCONNECT, this.onDisconnect);
+        mSocket.off(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
+        mSocket.off("login", this.onLogin);
         super.onDestroy();
     }
 
     private void attemptLogin() {
 
-        AppCompatEditText usernameInput = this.mDataBinding.usernameInput;
+        AppCompatEditText inputUsername = this.mDataBinding.inputUsername;
 
         // Reset errors.
-        usernameInput.setError(null);
+        inputUsername.setError(null);
 
         // Check for a valid username
-        assert usernameInput.getText() != null;
-        String username = usernameInput.getText().toString().trim();
-        usernameInput.setText(username); // trimmed.
-
-        if (TextUtils.isEmpty(username)) {
-            usernameInput.setError(getString(R.string.error_field_required));
-            usernameInput.requestFocus();
+        String username = Objects.requireNonNull(inputUsername.getText()).toString().trim();
+        if (username.isEmpty()) {
+            inputUsername.setError(getString(R.string.error_field_required));
+            inputUsername.requestFocus();
             return;
+        } else {
+            inputUsername.setText(username); // trimmed.
+            // inputUsername.setEnabled(false);
         }
 
         // perform the login attempt
@@ -99,8 +108,45 @@ public class LoginFragment extends BaseFragment {
             prefs.edit().putString("username", username).apply();
         } else {
             String message = "socket not connected";
-            usernameInput.setError(message);
-            Log.e(LOG_TAG, message);
+            this.mDataBinding.setConnection(message);
+            this.mDataBinding.executePendingBindings();
         }
+
+        // inputUsername.setEnabled(true);
+    }
+
+    private void gotoChatFragment(String socketId, String username, int usercount) {
+
+        Bundle navArgs = new Bundle();
+        navArgs.putString("socketId", socketId);
+        navArgs.putString("username", username);
+        navArgs.putInt("usercount", usercount);
+
+        /* Navigate to ChatFragment */
+        if (requireActivity() instanceof MainActivity activity) {
+            activity.runOnUiThread(() -> {
+                this.mDataBinding.setConnection(socketId);
+                this.mDataBinding.executePendingBindings();
+                if (activity.getCurrentFragment() instanceof LoginFragment) {
+                    activity.getNavController().navigate(R.id.action_loginFragment_to_chatFragment, navArgs);
+                }
+            });
+        }
+    }
+
+    protected final Emitter.Listener onLogin = args -> {
+        JSONObject data = (JSONObject) args[0];
+        try {
+            String socketId = data.getString("socketId");
+            int usercount = data.getInt("usercount");
+            Log.d(LOG_TAG, "room " + socketId + " has " + usercount + " participants");
+            this.gotoChatFragment(socketId, this.username, usercount);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
+        }
+    };
+
+    public FragmentLoginBinding getDataBinding() {
+        return this.mDataBinding;
     }
 }

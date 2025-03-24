@@ -15,7 +15,6 @@ import android.view.inputmethod.EditorInfo;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,18 +35,16 @@ import io.syslogic.socketio.recyclerview.ChatAdapter;
 public class ChatFragment extends BaseFragment {
     private static final String LOG_TAG = ChatFragment.class.getSimpleName();
     private FragmentChatBinding mDataBinding = null;
-    private static final int TYPING_TIMER_LENGTH = 600;
-    private final ArrayList<ChatMessage> mMessages = new ArrayList<>();
+    private final ArrayList<ChatMessage> mItems = new ArrayList<>();
+    private ChatAdapter mAdapter;
+    private static final int TYPING_TIMER_DURATION = 600;
     private final Handler mTypingHandler = new Handler(Looper.getMainLooper());
-    private RecyclerView.Adapter<?> mAdapter;
     private boolean mTyping = false;
-    private int[] mUsernameColors;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        mAdapter = new ChatAdapter(this.mMessages);
-        mUsernameColors = context.getResources().getIntArray(R.array.username_colors);
+        mAdapter = new ChatAdapter(this.mItems);
     }
 
     @Override
@@ -55,6 +52,16 @@ public class ChatFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         if (requireActivity() instanceof MainActivity activity) {
             activity.addChatMenuProvider();
+            mSocket = activity.getSocket();
+            mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
+            mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
+            mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
+            mSocket.on("new message", onNewMessage);
+            mSocket.on("user joined", onUserJoined);
+            mSocket.on("user left", onUserLeft);
+            mSocket.on("typing", onTyping);
+            mSocket.on("stop typing", onStopTyping);
+            if (!mSocket.connected()) {mSocket.connect();}
         }
     }
 
@@ -68,6 +75,10 @@ public class ChatFragment extends BaseFragment {
         mSocket.off("user left", onUserLeft);
         mSocket.off("typing", onTyping);
         mSocket.off("stop typing", onStopTyping);
+
+        if (requireActivity() instanceof MainActivity activity) {
+            leaveRoom(activity);
+        }
         super.onDestroy();
     }
 
@@ -75,15 +86,22 @@ public class ChatFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         this.mDataBinding = FragmentChatBinding.inflate(inflater, parent, false);
 
-        this.mDataBinding.messageInput.setOnEditorActionListener((view, id, event) -> {
-            if (id == R.id.send_button || id == EditorInfo.IME_NULL) {
+        this.mDataBinding.recyclerviewMessages.setLayoutManager(new LinearLayoutManager(requireContext()));
+        this.mDataBinding.recyclerviewMessages.setAdapter(this.mAdapter);
+
+        this.mDataBinding.buttonSend.setOnClickListener(view -> {
+            attemptSend();
+        });
+
+        this.mDataBinding.inputMessage.setOnEditorActionListener((view, id, event) -> {
+            if (id == R.id.button_send || id == EditorInfo.IME_NULL) {
                 attemptSend();
                 return true;
             }
             return false;
         });
 
-        this.mDataBinding.messageInput.addTextChangedListener(new TextWatcher() {
+        this.mDataBinding.inputMessage.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
@@ -94,13 +112,11 @@ public class ChatFragment extends BaseFragment {
                     mSocket.emit("typing");
                 }
                 mTypingHandler.removeCallbacks(onTypingTimeout);
-                mTypingHandler.postDelayed(onTypingTimeout, TYPING_TIMER_LENGTH);
+                mTypingHandler.postDelayed(onTypingTimeout, TYPING_TIMER_DURATION);
             }
             @Override
             public void afterTextChanged(Editable s) {}
         });
-
-        this.mDataBinding.sendButton.setOnClickListener(view -> attemptSend());
 
         return this.mDataBinding.getRoot();
     }
@@ -109,54 +125,21 @@ public class ChatFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        this.mDataBinding.recyclerviewMessages.setLayoutManager(new LinearLayoutManager(getActivity()));
-        this.mDataBinding.recyclerviewMessages.setAdapter(mAdapter);
+        Bundle args = requireArguments();
+        String socketId = args.getString("socketId", null);
+        String username = args.getString("username", null);
+        int usercount = args.getInt("usercount", 0);
+        this.mDataBinding.setItem(
+                new ChatRoom.Builder()
+                    .setSocketId(socketId)
+                    .setUsername(username)
+                    .setUsercount(usercount)
+                    .build()
+        );
 
-        if (savedInstanceState == null) {
-            Bundle args = requireArguments();
-            String socketId = args.getString("socketId", null);
-            String username = args.getString("username", null);
-            int userCount = args.getInt("userCount", 0);
-
-            ChatRoom item = new ChatRoom.Builder()
-                    .socketId(socketId)
-                    .username(username)
-                    .userCount(userCount)
-                    .build();
-
-            this.mDataBinding.setItem(item);
-        }
-
-        if (requireActivity() instanceof MainActivity activity) {
-
-            mSocket = activity.getSocket();
-            mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
-            mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
-            mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-            mSocket.on("new message", onNewMessage);
-            mSocket.on("user joined", onUserJoined);
-            mSocket.on("user left", onUserLeft);
-            mSocket.on("typing", onTyping);
-            mSocket.on("stop typing", onStopTyping);
-            if (! mSocket.connected()) {mSocket.connect();}
-
-            if (activity.getUserName() == null) {
-                startSignIn(activity);
-            } else {
-                // addLog(getResources().getString(R.string.message_welcome));
-                addUserCount(getUserCount());
-                this.mDataBinding.messageInput.requestFocus();
-            }
-        }
-    }
-
-    private int getUserCount() {
-        // return this.mDataBinding.getItem().getUserCount();
-        if (requireActivity() instanceof MainActivity activity) {
-            return activity.getUserCount();
-        } else {
-            return 0;
-        }
+        // addLog(getResources().getString(R.string.message_welcome));
+        this.addUserCount(usercount);
+        this.mDataBinding.inputMessage.requestFocus();
     }
 
     private void addUserCount(int numUsers) {
@@ -164,39 +147,29 @@ public class ChatFragment extends BaseFragment {
         addLog(message);
     }
 
-    @SuppressWarnings("unused")
-    public int getUsernameColor(@NonNull String username) {
-        int hash = 7;
-        for (int i = 0, len = username.length(); i < len; i++) {
-            hash = username.codePointAt(i) + (hash << 5) - hash;
-        }
-        int index = Math.abs(hash % mUsernameColors.length);
-        return mUsernameColors[index];
-    }
-
     private void addItem(ChatMessage item) {
-        this.mMessages.add(item);
-        mAdapter.notifyItemInserted(mMessages.size() - 1);
+        this.mItems.add(item);
+        mAdapter.notifyItemInserted(this.mItems.size() - 1);
         scrollToBottom();
     }
 
     private void addLog(String message) {
-        addItem(new ChatMessage.Builder(ChatMessage.TYPE_LOG).message(message).build());
+        addItem(new ChatMessage.Builder(ChatMessage.TYPE_LOG).setMessage(message).build());
     }
 
     private void addMessage(String username, String message) {
-        addItem(new ChatMessage.Builder(ChatMessage.TYPE_MESSAGE).username(username).message(message).build());
+        addItem(new ChatMessage.Builder(ChatMessage.TYPE_MESSAGE).setUsername(username).setMessage(message).build());
     }
 
     private void addTyping(String username) {
-        addItem(new ChatMessage.Builder(ChatMessage.TYPE_ACTION).username(username).build());
+        addItem(new ChatMessage.Builder(ChatMessage.TYPE_ACTION).setUsername(username).build());
     }
 
     private void removeTyping(String username) {
-        for (int i = this.mMessages.size() - 1; i >= 0; i--) {
-            ChatMessage message = mMessages.get(i);
+        for (int i = this.mItems.size() - 1; i >= 0; i--) {
+            ChatMessage message = this.mItems.get(i);
             if (message.getType() == ChatMessage.TYPE_ACTION && message.getUsername().equals(username)) {
-                this.mMessages.remove(i);
+                this.mItems.remove(i);
                 mAdapter.notifyItemRemoved(i);
             }
         }
@@ -204,29 +177,22 @@ public class ChatFragment extends BaseFragment {
 
     private void attemptSend() {
 
-        if (requireActivity() instanceof MainActivity activity) {
-
-            if (activity.getUserName() == null) {return;}
-            if (!mSocket.connected()) {return;}
-
-            mTyping = false;
-
-            String message = Objects.requireNonNull(this.mDataBinding.messageInput.getText()).toString().trim();
-            if (TextUtils.isEmpty(message)) {
-                this.mDataBinding.messageInput.requestFocus();
-                return;
-            }
-
-            this.mDataBinding.messageInput.setText("");
-            addMessage(activity.getUserName(), message);
-
-            // perform the sending message attempt
-            mSocket.emit("new message", message);
+        mTyping = false;
+        if (!mSocket.connected()) {return;}
+        String message = Objects.requireNonNull(this.mDataBinding.inputMessage.getText()).toString().trim();
+        if (TextUtils.isEmpty(message)) {
+            this.mDataBinding.inputMessage.requestFocus();
+            return;
         }
+
+        // perform the sending message attempt
+        addMessage(this.mDataBinding.getItem().getUsername(), message);
+        mSocket.emit("new message", message);
+
+        this.mDataBinding.inputMessage.setText("");
     }
 
     private void startSignIn(@NonNull MainActivity activity) {
-        activity.setUserName(null);
         activity.getNavController().navigateUp();
     }
 
@@ -243,89 +209,84 @@ public class ChatFragment extends BaseFragment {
         this.mDataBinding.recyclerviewMessages.scrollToPosition(mAdapter.getItemCount() - 1);
     }
 
-    private final Emitter.Listener onNewMessage = args -> {
-        requireActivity().runOnUiThread(() -> {
-            JSONObject data = (JSONObject) args[0];
-            String username;
-            String message;
-            try {
-                username = data.getString("username");
-                message = data.getString("message");
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
-                return;
-            }
-            removeTyping(username);
-            addMessage(username, message);
-        });
-    };
+    private final Emitter.Listener onNewMessage = args -> requireActivity().runOnUiThread(() -> {
+        JSONObject data = (JSONObject) args[0];
+        String username;
+        String message;
+        try {
+            username = data.getString("username");
+            message = data.getString("message");
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
+            return;
+        }
+        removeTyping(username);
+        addMessage(username, message);
+    });
 
-    private final Emitter.Listener onUserJoined = args -> {
-        requireActivity().runOnUiThread(() -> {
-            JSONObject data = (JSONObject) args[0];
-            String username;
-            int numUsers;
-            try {
-                username = data.getString("username");
-                numUsers = data.getInt("numUsers");
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
-                return;
-            }
-            addLog(getResources().getString(R.string.message_user_joined, username));
-            addUserCount(numUsers);
-        });
-    };
+    private final Emitter.Listener onUserJoined = args -> requireActivity().runOnUiThread(() -> {
+        JSONObject data = (JSONObject) args[0];
+        String username;
+        int usercount;
+        try {
+            username = data.getString("username");
+            usercount = data.getInt("usercount");
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
+            return;
+        }
+        addLog(getResources().getString(R.string.message_user_joined, username));
+        addUserCount(usercount);
+    });
 
-    private final Emitter.Listener onUserLeft = args -> {
-        requireActivity().runOnUiThread(() -> {
-            JSONObject data = (JSONObject) args[0];
-            String username;
-            int numUsers;
-            try {
-                username = data.getString("username");
-                numUsers = data.getInt("numUsers");
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
-                return;
-            }
-            addLog(getResources().getString(R.string.message_user_left, username));
-            removeTyping(username);
-            addUserCount(numUsers);
-        });
-    };
+    private final Emitter.Listener onUserLeft = args -> requireActivity().runOnUiThread(() -> {
+        JSONObject data = (JSONObject) args[0];
+        String username;
+        int usercount;
+        try {
+            username = data.getString("username");
+            usercount = data.getInt("usercount");
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
+            return;
+        }
+        addLog(getResources().getString(R.string.message_user_left, username));
+        removeTyping(username);
+        addUserCount(usercount);
+    });
 
-    private final Emitter.Listener onTyping = args -> {
-        requireActivity().runOnUiThread(() -> {
-            JSONObject data = (JSONObject) args[0];
-            String username;
-            try {
-                username = data.getString("username");
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
-                return;
-            }
-            addTyping(username);
-        });
-    };
+    private final Emitter.Listener onTyping = args -> requireActivity().runOnUiThread(() -> {
+        JSONObject data = (JSONObject) args[0];
+        String username;
+        try {
+            username = data.getString("username");
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
+            return;
+        }
+        addTyping(username);
+    });
 
-    private final Emitter.Listener onStopTyping = args -> {
-        requireActivity().runOnUiThread(() -> {
-            JSONObject data = (JSONObject) args[0];
-            String username;
-            try {
-                username = data.getString("username");
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
-                return;
-            }
-            removeTyping(username);
-        });
-    };
+    private final Emitter.Listener onStopTyping = args -> requireActivity().runOnUiThread(() -> {
+        JSONObject data = (JSONObject) args[0];
+        String username;
+        try {
+            username = data.getString("username");
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
+            return;
+        }
+        removeTyping(username);
+    });
 
     private final Runnable onTypingTimeout = () -> {
         if (! mTyping) {return;}
         mTyping = false;
         mSocket.emit("stop typing");
     };
+
+    /** @noinspection unused */
+    public FragmentChatBinding getDataBinding() {
+        return this.mDataBinding;
+    }
 }

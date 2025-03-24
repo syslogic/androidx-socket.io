@@ -28,6 +28,7 @@ androidx_test_rules          = "1.5.0"
 androidx_test_runner         = "1.5.2"
 #noinspection GradleDependency
 androidx_test_espresso       = "3.5.1"
+androidx_test_uiautomator    = "2.3.0"
 
 
 [plugins]
@@ -55,8 +56,9 @@ androidx_test_junit          = { module = "androidx.test.ext:junit", version.ref
 androidx_test_rules          = { module = "androidx.test:rules", version.ref = "androidx_test_rules" }
 androidx_test_runner         = { module = "androidx.test:runner", version.ref = "androidx_test_runner" }
 androidx_test_espresso_core  = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx_test_espresso" }
+androidx_test_uiautomator    = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "androidx_test_uiautomator" }
 
 [bundles]
 androidx                     = [ "androidx_appcompat", "androidx_fragment", "androidx_navigation_fragment", "androidx_navigation_ui", "androidx_recyclerview", "androidx_preference" ]
 androidx_testing             = [ "androidx_navigation_testing", "androidx_fragment_testing" ]
-androidx_test                = [ "androidx_test_core", "androidx_test_junit", "androidx_test_rules", "androidx_test_runner", "androidx_test_espresso_core" ]
+androidx_test                = [ "androidx_test_core", "androidx_test_junit", "androidx_test_rules", "androidx_test_runner", "androidx_test_espresso_core", "androidx_test_uiautomator" ]

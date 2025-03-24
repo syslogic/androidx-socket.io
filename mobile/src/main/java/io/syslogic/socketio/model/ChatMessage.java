@@ -45,22 +45,18 @@ public class ChatMessage extends BaseObservable {
             mType = type;
         }
 
-        public Builder username(String username) {
+        public Builder setUsername(String username) {
             this.mUsername = username;
             return this;
         }
 
-        public Builder message(String message) {
+        public Builder setMessage(String message) {
             this.mMessage = message;
             return this;
         }
 
         public ChatMessage build() {
-            ChatMessage message = new ChatMessage();
-            message.mType = this.mType;
-            message.mUsername = this.mUsername;
-            message.mMessage = this.mMessage;
-            return message;
+            return new ChatMessage(this.mType, this.mMessage,  this.mUsername);
         }
     }
 }

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_login">
 
-    <data/>
+    <data>
+        <variable name="connection" type="java.lang.String"/>
+    </data>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -20,7 +22,7 @@
             android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/username_input"
+                android:id="@+id/input_username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_username"
@@ -32,8 +34,22 @@
                 android:singleLine="true"
                 android:importantForAutofill="no"/>
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_connection"
+                style="?android:textAppearanceSmall"
+                android:gravity="center_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:textColor="@color/username5"
+                android:text="@{ connection }"
+                android:textStyle="bold"
+                tools:text="@string/text_socket_id"/>
+
+            <!--  android:onClick="attemptLogin" -->
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/sign_in_button"
+                android:id="@+id/button_sign_in"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -44,4 +60,5 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
 
     </ScrollView>
+
 </layout>

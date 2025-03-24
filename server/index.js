@@ -1,16 +1,24 @@
-var port = process.env.PORT || 3000;
 var path = require('path');
 var express = require('express');
+var port = process.env.PORT || 3000;
+
 var app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 var server = require('http').createServer(app);
+
+// Close the server if listening doesn't fail
+// server.once('listening', function() {
+    // console.log('Closing port %d...', port);
+    // server.close();
+// });
+
+server.listen(port, () => {
+    console.log('Listing at port %d', port);
+});
+
 var io = require('socket.io')(server,  {
     transports: ['polling', 'websocket'],
     path: '/socket.io'
-});
-
-server.listen(port, () => {
-    console.log('Server listening at port %d', port);
 });
 
 // Chatroom
@@ -33,6 +41,7 @@ io.on('connection', (socket) => {
 
     // when the client emits 'add user', this listens and executes
     socket.on('add user', (username) => {
+
         if (addedUser) return;
 
         // store the username in the socket session for this client
@@ -41,15 +50,15 @@ io.on('connection', (socket) => {
         numUsers++;
 
         socket.emit('login', {
-            userCount: numUsers,
+            usercount: numUsers,
             socketId: socket.id
         });
 
         // broadcast that a user has connected
-        console.log('user %s has joined; socket %s', socket.username, socket.id);
+        console.log('user %s has joined; socketId %s', socket.username, socket.id);
         socket.broadcast.emit('user joined', {
             username: socket.username,
-            userCount: numUsers
+            usercount: numUsers
         });
     });
 
@@ -70,12 +79,15 @@ io.on('connection', (socket) => {
     // when the user disconnects
     socket.on('disconnect', () => {
         if (addedUser) {
+
+            addedUser = false;
             numUsers--;
+
             // echo globally that this client has left
-            console.log('user %s has left', socket.username);
+            console.log('user %s has left; socketId %s', socket.username, socket.id);
             socket.broadcast.emit('user left', {
                 username: socket.username,
-                userCount: numUsers
+                usercount: numUsers
             });
         }
     });
