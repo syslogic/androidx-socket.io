@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -19,8 +18,8 @@ import org.json.JSONObject;
 import java.util.Objects;
 
 import io.socket.client.Socket;
-
 import io.socket.emitter.Emitter;
+
 import io.syslogic.socketio.R;
 import io.syslogic.socketio.activity.MainActivity;
 import io.syslogic.socketio.databinding.FragmentLoginBinding;
@@ -32,7 +31,6 @@ public class LoginFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (requireActivity() instanceof MainActivity activity) {
             activity.removeMenuProvider();
             mSocket = activity.getSocket();
@@ -46,10 +44,14 @@ public class LoginFragment extends BaseFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+
         this.mDataBinding = FragmentLoginBinding.inflate(inflater, parent, false);
+        if (requireActivity() instanceof MainActivity activity) {
+            activity.setSupportActionBar(this.getDataBinding().toolbarLogin);
+        }
 
         this.mDataBinding.inputUsername.setOnEditorActionListener((textView, id, keyEvent) -> {
-            if (id == R.id.button_sign_in || id == EditorInfo.IME_NULL) {
+            if (id == R.id.button_sign_in /* || id == EditorInfo.IME_NULL */) {
                 this.attemptLogin();
                 return true;
             }
@@ -66,11 +68,6 @@ public class LoginFragment extends BaseFragment {
         if (username != null) {this.mDataBinding.inputUsername.setText(username);}
 
         return this.mDataBinding.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -138,9 +135,9 @@ public class LoginFragment extends BaseFragment {
         JSONObject data = (JSONObject) args[0];
         try {
             String socketId = data.getString("socketId");
-            int usercount = data.getInt("usercount");
+            String usercount = String.valueOf(data.getInt("usercount"));
             Log.d(LOG_TAG, "room " + socketId + " has " + usercount + " participants");
-            this.gotoChatFragment(socketId, this.username, usercount);
+            this.gotoChatFragment(socketId, this.username, Integer.parseInt(usercount));
         } catch (JSONException e) {
             Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
         }

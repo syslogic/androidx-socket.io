@@ -2,6 +2,7 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment_chat">
 
     <data>
@@ -13,6 +14,17 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context="io.syslogic.socketio.fragment.ChatFragment">
+
+        <!-- MaterialToolbar -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar_chat"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize"
+            android:layout_gravity="start|top"
+            android:contentInsetStart="0dp"
+            android:elevation="4dp"
+            android:padding="0dp"
+            app:contentInsetStart="0dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_messages"

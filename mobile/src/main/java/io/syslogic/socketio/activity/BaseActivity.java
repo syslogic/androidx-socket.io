@@ -26,9 +26,7 @@ import io.syslogic.socketio.menu.ChatMenuProvider;
 
 abstract public class BaseActivity extends AppCompatActivity {
     @NonNull final static String LOG_TAG = BaseActivity.class.getSimpleName();
-    BaseFragment currentFragment = null;
     FragmentNavHostBinding mDataBinding = null;
-    NavController navController = null;
     MenuProvider menuProvider = null;
     Socket mSocket = null;
 
@@ -41,7 +39,6 @@ abstract public class BaseActivity extends AppCompatActivity {
             } else if (getNavController().popBackStack()) {
 
                 // TODO: rebind button click events ??
-                // NavDestination dest = getNavController().getCurrentDestination();
             }
         }
     };
@@ -49,10 +46,9 @@ abstract public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (this.mSocket == null) {this.initSocket();}
+        if (this.mSocket == null) {this.getSocket();}
         this.mDataBinding = FragmentNavHostBinding.inflate(LayoutInflater.from(this), findViewById(android.R.id.content), true);
-        this.navController = NavHostFragment.findNavController(getNavHostFragment());
-        this.navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+        this.getNavController().addOnDestinationChangedListener((controller, destination, arguments) -> {
             String message = "onDestinationChanged: " + destination.getNavigatorName()  + " " + destination.getLabel();
             Log.d(LOG_TAG, message);
         });
@@ -77,15 +73,11 @@ abstract public class BaseActivity extends AppCompatActivity {
 
     @NonNull
     public NavController getNavController() {
-        return this.navController;
+        return NavHostFragment.findNavController(getNavHostFragment());
     }
 
     @NonNull
     public Socket getSocket() {
-        return this.initSocket();
-    }
-
-    public Socket initSocket() {
         if (this.mSocket == null) {
             try {
                 this.mSocket = IO.socket(getServerUrl(), new IO.Options());

@@ -85,6 +85,9 @@ public class ChatFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         this.mDataBinding = FragmentChatBinding.inflate(inflater, parent, false);
+        if (requireActivity() instanceof MainActivity activity) {
+            activity.setSupportActionBar(this.getDataBinding().toolbarChat);
+        }
 
         this.mDataBinding.recyclerviewMessages.setLayoutManager(new LinearLayoutManager(requireContext()));
         this.mDataBinding.recyclerviewMessages.setAdapter(this.mAdapter);
@@ -94,7 +97,7 @@ public class ChatFragment extends BaseFragment {
         });
 
         this.mDataBinding.inputMessage.setOnEditorActionListener((view, id, event) -> {
-            if (id == R.id.button_send || id == EditorInfo.IME_NULL) {
+            if (id == R.id.button_send /* || id == EditorInfo.IME_NULL */) {
                 attemptSend();
                 return true;
             }
@@ -129,6 +132,8 @@ public class ChatFragment extends BaseFragment {
         String socketId = args.getString("socketId", null);
         String username = args.getString("username", null);
         int usercount = args.getInt("usercount", 0);
+        this.mDataBinding.toolbarChat.setSubtitle(socketId);
+
         this.mDataBinding.setItem(
                 new ChatRoom.Builder()
                     .setSocketId(socketId)

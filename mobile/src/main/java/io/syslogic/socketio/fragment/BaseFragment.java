@@ -47,12 +47,12 @@ public class BaseFragment extends Fragment {
 
         if (requireActivity() instanceof MainActivity activity) {
             // final EngineIOException e = (EngineIOException) args[0];
-            final String message = "Error connecting to \"" + activity.getServerUrl() + "\".";
+            final String message = "Error connecting to " + activity.getServerUrl();
             activity.runOnUiThread(() -> {
 
                 Log.e(LOG_TAG, message);
 
-                if (this instanceof LoginFragment fragment) {
+                if (activity.getCurrentFragment() instanceof LoginFragment fragment) {
                     fragment.getDataBinding().setConnection(message);
                     fragment.getDataBinding().executePendingBindings();
                 } else if (this instanceof ChatFragment fragment) {
