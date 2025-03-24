@@ -1,13 +1,13 @@
 [versions]
 app_versionCode              = "1"
-app_versionName              = "1.0.0"
+app_versionName              = "1.0.1"
 android_buildTools           = "35.0.0"
 android_compileSdk           = "35"
 android_targetSdk            = "35"
 android_minSdk               = "24"
 
 kotlin                       = "2.1.20"
-android_gradle_plugin        = "8.9.0"
+android_gradle_plugin        = "8.9.1"
 material_design              = "1.12.0"
 androidx_navigation          = "2.8.9"
 androidx_appcompat           = "1.7.0"
