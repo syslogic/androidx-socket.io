@@ -51,16 +51,18 @@ public class ChatFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         if (requireActivity() instanceof MainActivity activity) {
             activity.addChatMenuProvider();
-            mSocket = activity.getSocket();
-            mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
-            mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
-            mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-            mSocket.on("new message", onNewMessage);
-            mSocket.on("user joined", onUserJoined);
-            mSocket.on("user left", onUserLeft);
-            mSocket.on("typing", onTyping);
-            mSocket.on("stop typing", onStopTyping);
-            if (!mSocket.connected()) {mSocket.connect();}
+            if (savedInstanceState == null) {
+                mSocket = activity.getSocket();
+                mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
+                mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
+                mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
+                mSocket.on("new message", onNewMessage);
+                mSocket.on("user joined", onUserJoined);
+                mSocket.on("user left", onUserLeft);
+                mSocket.on("typing", onTyping);
+                mSocket.on("stop typing", onStopTyping);
+                if (!mSocket.connected()) {mSocket.connect();}
+            }
         }
     }
 

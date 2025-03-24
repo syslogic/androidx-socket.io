@@ -42,7 +42,14 @@ io.on('connection', (socket) => {
     // when the client emits 'add user', this listens and executes
     socket.on('add user', (username) => {
 
-        if (addedUser) return;
+        if (addedUser) {
+            console.log('user %s was already added', socket.username);
+            socket.emit('login', {
+                usercount: numUsers,
+                socketId: socket.id
+            });
+            return;
+        }
 
         // store the username in the socket session for this client
         socket.username = username;
