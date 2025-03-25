@@ -3,14 +3,18 @@ package io.syslogic.socketio.model;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 
-public class ChatUser extends BaseObservable {
+/**
+ * Model: Client Socket
+ * @author Martin Zeitler
+ */
+public class ClientSocket extends BaseObservable {
     public static final int TYPE_DEFAULT  = 0;
     public static final int TYPE_OPERATOR = 1;
     private final Integer userType;
     private final String socketId;
     private final String username;
 
-    public ChatUser(Integer userType, String socketId, String username) {
+    public ClientSocket(Integer userType, String socketId, String username) {
         this.userType = userType;
         this.socketId = socketId;
         this.username = username;
@@ -54,8 +58,8 @@ public class ChatUser extends BaseObservable {
             return this;
         }
 
-        public ChatUser build() {
-            return new ChatUser(this.userType, this.socketId, this.username);
+        public ClientSocket build() {
+            return new ClientSocket(this.userType, this.socketId, this.username);
         }
     }
 }

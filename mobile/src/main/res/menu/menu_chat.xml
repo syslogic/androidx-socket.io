@@ -6,9 +6,15 @@
     tools:context="io.syslogic.socketio.activity.MainActivity">
 
     <item
-        android:id="@+id/action_leave"
-        android:title="@string/action_leave"
+        android:id="@+id/menu_menu_action_sockets"
+        android:title="@string/text_menu_action_sockets"
         android:orderInCategory="100"
-        app:showAsAction="never"/>
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/menu_action_leave_chat"
+        android:title="@string/text_menu_action_leave_chat"
+        android:orderInCategory="200"
+        app:showAsAction="ifRoom"/>
 
 </menu>

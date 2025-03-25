@@ -3,6 +3,10 @@ package io.syslogic.socketio.model;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 
+/**
+ * Model: Chat Room
+ * @author Martin Zeitler
+ */
 public class ChatRoom extends BaseObservable {
 
     private final String socketId;

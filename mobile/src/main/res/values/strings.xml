@@ -17,7 +17,8 @@
     <string name="action_sign_in_short">Join</string>
 
     <!-- Chat -->
-    <string name="action_leave">Leave</string>
+    <string name="text_menu_action_sockets">Connected</string>
+    <string name="text_menu_action_leave_chat">Leave Chat</string>
     <string name="action_send">Send</string>
     <string name="prompt_message">Message</string>
     <string name="connect">Connected</string>

@@ -3,11 +3,16 @@ package io.syslogic.socketio.model;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 
+/**
+ * Model: Chat Message
+ * @author Martin Zeitler
+ */
 public class ChatMessage extends BaseObservable {
 
     public static final int TYPE_MESSAGE = 0;
-    public static final int TYPE_LOG     = 1;
+    public static final int TYPE_DIRECT  = 1;
     public static final int TYPE_ACTION  = 2;
+    public static final int TYPE_LOG     = 3;
 
     private Integer mType;
     private String mMessage;

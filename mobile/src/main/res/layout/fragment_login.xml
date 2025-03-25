@@ -6,7 +6,7 @@
     android:id="@+id/fragment_login">
 
     <data>
-        <variable name="connection" type="java.lang.String"/>
+        <variable name="socketId" type="java.lang.String"/>
     </data>
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -55,7 +55,7 @@
                     android:importantForAutofill="no"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/text_connection"
+                    android:id="@+id/text_socket_id"
                     style="?android:textAppearanceSmall"
                     android:gravity="center_horizontal"
                     android:layout_width="match_parent"
@@ -63,7 +63,7 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
                     android:textColor="@color/username5"
-                    android:text="@{ connection }"
+                    android:text="@{ socketId }"
                     android:textStyle="bold"
                     tools:text="@string/tools_text_socket_id"/>
 

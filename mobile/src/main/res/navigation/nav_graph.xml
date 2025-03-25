@@ -25,6 +25,21 @@
         <argument android:name="socketId" android:defaultValue="@null" app:nullable="true" app:argType="string"/>
         <argument android:name="username" android:defaultValue="@null" app:nullable="true" app:argType="string"/>
         <argument android:name="usercount" android:defaultValue="0" app:argType="integer"/>
+        <action
+            android:id="@+id/action_chatFragment_to_socketsDialogFragment"
+            app:destination="@id/socketsDialogFragment" />
+        <action
+            android:id="@+id/action_chatFragment_to_loginDialogFragment"
+            app:destination="@id/loginDialogFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/socketsDialogFragment"
+        android:name="io.syslogic.socketio.dialog.SocketsDialogFragment"
+        android:label="dialog_sockets"
+        tools:layout="@layout/dialog_sockets" />
+    <dialog
+        android:id="@+id/loginDialogFragment"
+        android:name="io.syslogic.socketio.dialog.LoginDialogFragment"
+        android:label="LoginDialogFragment" />
 
 </navigation>

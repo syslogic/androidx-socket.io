@@ -3,7 +3,6 @@ package io.syslogic.socketio.recyclerview;
 import static io.syslogic.socketio.model.ChatMessage.TYPE_ACTION;
 import static io.syslogic.socketio.model.ChatMessage.TYPE_LOG;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -18,10 +17,14 @@ import io.syslogic.socketio.databinding.CardviewLogBinding;
 import io.syslogic.socketio.databinding.CardviewMessageBinding;
 import io.syslogic.socketio.model.ChatMessage;
 
-public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.ViewHolder> {
+/**
+ * Message {@link RecyclerView.Adapter}
+ * @author Martin Zeitler
+ */
+public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
     private final ArrayList<ChatMessage> mItems;
 
-    public ChatMessageAdapter(@NonNull ArrayList<ChatMessage> items) {
+    public MessageAdapter(@NonNull ArrayList<ChatMessage> items) {
         this.mItems = items;
     }
 

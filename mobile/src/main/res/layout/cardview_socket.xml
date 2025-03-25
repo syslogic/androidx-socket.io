@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="item" type="io.syslogic.socketio.model.ClientSocket"/>
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.MaterialComponents.CardView"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/cardview"
+        android:clickable="true"
+        android:focusable="true">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/line_padding"
+            android:paddingStart="@dimen/message_padding"
+            android:paddingEnd="@dimen/message_padding">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/socketId"
+                style="?android:textAppearanceMedium"
+                android:textColor="?android:textColorSecondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="@{ item.socketId }"
+                tools:text="@string/tools_text_socket_id"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/username"
+                style="?android:textAppearanceMedium"
+                android:textColor="?android:textColorSecondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="@{ item.username }"
+                tools:text="@string/tools_text_username"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

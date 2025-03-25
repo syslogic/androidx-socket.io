@@ -2,8 +2,8 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="io.syslogic.socketio.dialog.UsersDialogFragment"
-    android:id="@+id/dialog_users">
+    tools:context="io.syslogic.socketio.dialog.SocketsDialogFragment"
+    android:id="@+id/dialog_sockets">
 
     <data/>
 
@@ -13,7 +13,7 @@
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview_users"
+            android:id="@+id/recyclerview_sockets"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -21,7 +21,7 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:scrollbars="vertical"
             android:scrollbarStyle="outsideOverlay"
-            tools:listitem="@layout/cardview_user"/>
+            tools:listitem="@layout/cardview_socket"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

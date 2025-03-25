@@ -1,8 +1,7 @@
-package io.syslogic.socketio.fragment;
+package io.syslogic.socketio.dialog;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,42 +25,21 @@ import io.socket.emitter.Emitter;
 import io.syslogic.socketio.Constants;
 import io.syslogic.socketio.R;
 import io.syslogic.socketio.activity.MainActivity;
-import io.syslogic.socketio.databinding.FragmentLoginBinding;
+import io.syslogic.socketio.databinding.DialogLoginBinding;
 import io.syslogic.socketio.model.ClientSocket;
 
 /**
- * Login {@link BaseFragment}
+ * Login {@link BaseDialogFragment}
  * @author Martin Zeitler
  */
-public class LoginFragment extends BaseFragment {
-    private static final String LOG_TAG = LoginFragment.class.getSimpleName();
-    private FragmentLoginBinding mDataBinding = null;
+public class LoginDialogFragment extends BaseDialogFragment {
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (requireActivity() instanceof MainActivity activity) {
-            activity.removeMenuProvider();
-            if (savedInstanceState == null) {
-                mSocket = activity.getSocket();
-                mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
-                mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
-                mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-                mSocket.on(Constants.REQUEST_KEY_LOGIN, this.onLogin);
-                if (!mSocket.connected()) {
-                    mSocket.connect();
-                }
-            }
-        }
-    }
+    private static final String LOG_TAG = LoginDialogFragment.class.getSimpleName();
+    private DialogLoginBinding mDataBinding = null;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         this.setDataBinding(inflater, container);
-        if (requireActivity() instanceof MainActivity activity) {
-            activity.setSupportActionBar(this.getDataBinding().toolbarLogin);
-        }
 
         this.mDataBinding.inputUsername.setOnEditorActionListener((textView, id, keyEvent) -> {
             if (id == R.id.button_sign_in /* || id == EditorInfo.IME_NULL */) {
@@ -79,17 +57,7 @@ public class LoginFragment extends BaseFragment {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
         String username = prefs.getString("username", null);
         if (username != null) {this.mDataBinding.inputUsername.setText(username);}
-
         return this.mDataBinding.getRoot();
-    }
-
-    @Override
-    public void onDestroy() {
-        mSocket.off(Socket.EVENT_CONNECT, this.onConnect);
-        mSocket.off(Socket.EVENT_DISCONNECT, this.onDisconnect);
-        mSocket.off(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-        mSocket.off(Constants.REQUEST_KEY_LOGIN, this.onLogin);
-        super.onDestroy();
     }
 
     private void attemptLogin() {
@@ -113,41 +81,17 @@ public class LoginFragment extends BaseFragment {
 
         // perform the login attempt
         this.username = username;
-        if (mSocket != null && mSocket.connected()) {
+        Socket socket = getSocket();
+        if (socket != null && socket.connected()) {
 
             // add the login emitter, before logging in.
-            mSocket.on(Constants.REQUEST_KEY_LOGIN, this.onLogin);
-            mSocket.emit(Constants.REQUEST_KEY_USER_ADD, username);
+            socket.on(Constants.REQUEST_KEY_LOGIN, this.onLogin);
+            socket.emit(Constants.REQUEST_KEY_USER_ADD, username);
 
         } else {
             String message = "socket not connected";
             this.mDataBinding.setSocketId(message);
             this.mDataBinding.executePendingBindings();
-        }
-    }
-
-    private void gotoChatFragment(String socketId, String username, int usercount) {
-
-        Bundle navArgs = new Bundle();
-        navArgs.putString("socketId", socketId);
-        navArgs.putString("username", username);
-        navArgs.putInt("usercount", usercount);
-
-        /* Navigate to ChatFragment */
-        if (requireActivity() instanceof MainActivity activity) {
-            activity.runOnUiThread(() -> {
-                this.mDataBinding.setSocketId(socketId);
-                this.mDataBinding.executePendingBindings();
-                if (activity.getCurrentFragment() instanceof LoginFragment) {
-                    try {
-                        activity.getNavController().navigate(
-                                R.id.action_loginFragment_to_chatFragment,
-                                navArgs
-                        );
-                    }
-                    catch (IllegalArgumentException ignore) {}
-                }
-            });
         }
     }
 
@@ -161,27 +105,42 @@ public class LoginFragment extends BaseFragment {
         try {
             String socketId = data.getString("socketId");
             JSONArray sockets = data.getJSONArray("data");
-            ArrayList<ClientSocket> items = this.parseSockets(sockets);
 
+            ArrayList<ClientSocket> items = this.parseSockets(sockets);
             Log.d(LOG_TAG, "room " + socketId + " has " + items.size() + " participants");
 
             // remove the emitter, else it will login endlessly.
-            mSocket.off(Constants.REQUEST_KEY_LOGIN, this.onLogin);
+            getSocket().off(Constants.REQUEST_KEY_LOGIN, this.onLogin);
 
-            this.gotoChatFragment(socketId, this.username, items.size());
+            this.navigateUp(socketId, this.username, items.size());
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
         }
     };
 
+    /** TODO: Add FragmentResultListener ... */
+    private void navigateUp(String socketId, String username, int size) {
+        if (requireActivity() instanceof MainActivity activity) {
+
+            Bundle result = new Bundle();
+            result.putString("socketId", socketId);
+            result.putString("username", username);
+            result.putInt("size", size);
+
+            getChildFragmentManager().setFragmentResult(Constants.REQUEST_KEY_LOGIN, result);
+            activity.getNavController().navigateUp();
+        }
+    }
+
     @Override
     protected void setDataBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        this.mDataBinding = FragmentLoginBinding.inflate(inflater, container, false);
+        this.mDataBinding = DialogLoginBinding.inflate(inflater, container, false);
     }
 
     @NonNull
-    public FragmentLoginBinding getDataBinding() {
+    public DialogLoginBinding getDataBinding() {
         return this.mDataBinding;
     }
+
 }

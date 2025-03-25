@@ -25,6 +25,10 @@ import io.syslogic.socketio.databinding.FragmentNavHostBinding;
 import io.syslogic.socketio.fragment.BaseFragment;
 import io.syslogic.socketio.menu.ChatMenuProvider;
 
+/**
+ * Main {@link AppCompatActivity}
+ * @author Martin Zeitler
+ */
 public class MainActivity extends AppCompatActivity {
     @NonNull final static String LOG_TAG = MainActivity.class.getSimpleName();
     FragmentNavHostBinding mDataBinding = null;
@@ -38,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
             if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                 getSupportFragmentManager().popBackStack();
             } else {
-                getNavController().popBackStack();
+                getOnBackPressedDispatcher().onBackPressed();
+                // getNavController().popBackStack();
             }
         }
     };

@@ -1,9 +1,8 @@
 package io.syslogic.socketio.recyclerview;
 
 // import static io.syslogic.socketio.model.ChatUser.TYPE_DEFAULT;
-import static io.syslogic.socketio.model.ChatUser.TYPE_OPERATOR;
+import static io.syslogic.socketio.model.ClientSocket.TYPE_OPERATOR;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -13,16 +12,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import io.syslogic.socketio.databinding.CardviewActionBinding;
-import io.syslogic.socketio.databinding.CardviewMessageBinding;
-import io.syslogic.socketio.databinding.CardviewUserBinding;
-import io.syslogic.socketio.model.ChatUser;
+import io.syslogic.socketio.databinding.CardviewSocketBinding;
+import io.syslogic.socketio.databinding.CardviewSocketOpBinding;
+import io.syslogic.socketio.model.ClientSocket;
 
-public class ChatUserAdapter extends RecyclerView.Adapter<ChatUserAdapter.ViewHolder> {
+/**
+ * Socket {@link RecyclerView.Adapter}
+ * @author Martin Zeitler
+ */
+public class SocketAdapter extends RecyclerView.Adapter<SocketAdapter.ViewHolder> {
 
-    private ArrayList<ChatUser> mItems = new ArrayList<>();
-    public ChatUserAdapter() {}
-    public ChatUserAdapter(@NonNull ArrayList<ChatUser> items) {
+    private ArrayList<ClientSocket> mItems = new ArrayList<>();
+    public SocketAdapter() {}
+    public SocketAdapter(@NonNull ArrayList<ClientSocket> items) {
         this.mItems = items;
     }
 
@@ -41,17 +43,17 @@ public class ChatUserAdapter extends RecyclerView.Adapter<ChatUserAdapter.ViewHo
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         return viewType == TYPE_OPERATOR ?
-                new ViewHolder(CardviewActionBinding.inflate(inflater, parent, false)):
-                new ViewHolder(CardviewMessageBinding.inflate(inflater, parent, false));
+                new ViewHolder(CardviewSocketOpBinding.inflate(inflater, parent, false)):
+                new ViewHolder(CardviewSocketBinding.inflate(inflater, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        ChatUser item = getItem(position);
+        ClientSocket item = getItem(position);
         viewHolder.bind(item);
     }
 
-    private ChatUser getItem(int position) {
+    private ClientSocket getItem(int position) {
         return mItems.get(position);
     }
 
@@ -64,8 +66,10 @@ public class ChatUserAdapter extends RecyclerView.Adapter<ChatUserAdapter.ViewHo
             this.mDataBinding = binding;
         }
 
-        void bind(ChatUser item) {
-            if (this.mDataBinding instanceof CardviewUserBinding binding) {
+        void bind(ClientSocket item) {
+            if (this.mDataBinding instanceof CardviewSocketBinding binding) {
+                binding.setItem(item);
+            } else if (this.mDataBinding instanceof CardviewSocketOpBinding binding) {
                 binding.setItem(item);
             }
             this.mDataBinding.executePendingBindings();

@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * [BaseActivityTest] for [MainActivity].
+ * Main {@link BaseActivityTest}.
  * @author Martin Zeitler
  */
 public class MainActivityTest extends BaseActivityTest {

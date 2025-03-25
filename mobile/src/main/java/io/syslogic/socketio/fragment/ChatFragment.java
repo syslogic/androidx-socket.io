@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import org.json.JSONException;
@@ -29,13 +31,17 @@ import io.syslogic.socketio.activity.MainActivity;
 import io.syslogic.socketio.databinding.FragmentChatBinding;
 import io.syslogic.socketio.model.ChatMessage;
 import io.syslogic.socketio.model.ChatRoom;
-import io.syslogic.socketio.recyclerview.ChatMessageAdapter;
+import io.syslogic.socketio.recyclerview.MessageAdapter;
 
-public class ChatFragment extends BaseFragment {
+/**
+ * Chat {@link BaseFragment}
+ * @author Martin Zeitler
+ */
+public class ChatFragment extends BaseFragment implements FragmentResultListener {
     private static final String LOG_TAG = ChatFragment.class.getSimpleName();
     private FragmentChatBinding mDataBinding = null;
     private final ArrayList<ChatMessage> mItems = new ArrayList<>();
-    private ChatMessageAdapter mAdapter;
+    private MessageAdapter mAdapter;
     private static final int TYPING_TIMER_DURATION = 600;
     private final Handler mTypingHandler = new Handler(Looper.getMainLooper());
     private boolean mTyping = false;
@@ -43,51 +49,49 @@ public class ChatFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (requireActivity() instanceof MainActivity activity) {
-            activity.addChatMenuProvider();
-            if (savedInstanceState == null) {
-                mSocket = activity.getSocket();
-                mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
-                mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
-                mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-                mSocket.on("chat message", this.onNewMessage);
-                mSocket.on("direct message", this.onPrivateMessage);
-                mSocket.on("user joined", this.onUserJoined);
-                mSocket.on("user left", this.onUserLeft);
-                mSocket.on("typing", this.onTyping);
-                mSocket.on("stop typing", this.onStopTyping);
-                if (!mSocket.connected()) {mSocket.connect();}
-            }
+        MainActivity activity = requireMainActivity();
+        this.addFragmentResultListener("login", this, true);
+        activity.addChatMenuProvider();
+        if (savedInstanceState == null) {
+            mSocket = activity.getSocket();
+            mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
+            mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
+            mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
+            mSocket.on("chat message", this.onChatMessage);
+            mSocket.on("direct message", this.onDirectMessage);
+            mSocket.on("user joined", this.onUserJoined);
+            mSocket.on("user left", this.onUserLeft);
+            mSocket.on("typing", this.onTyping);
+            mSocket.on("stop typing", this.onStopTyping);
+            if (!mSocket.connected()) {mSocket.connect();}
         }
     }
 
     @Override
     public void onDestroy() {
+        this.addFragmentResultListener("login", this, false);
         mSocket.off(Socket.EVENT_CONNECT, this.onConnect);
         mSocket.off(Socket.EVENT_DISCONNECT, this.onDisconnect);
         mSocket.off(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-        mSocket.off("chat message", this.onNewMessage);
-        mSocket.off("direct message", this.onPrivateMessage);
+        mSocket.off("chat message", this.onChatMessage);
+        mSocket.off("direct message", this.onDirectMessage);
         mSocket.off("user joined", this.onUserJoined);
         mSocket.off("user left", this.onUserLeft);
         mSocket.off("typing", this.onTyping);
         mSocket.off("stop typing", this.onStopTyping);
-
-        if (requireActivity() instanceof MainActivity activity) {
-            leaveRoom(activity);
-        }
+        leaveRoom(requireMainActivity());
         super.onDestroy();
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        this.mAdapter = new ChatMessageAdapter(this.mItems);
+        this.mAdapter = new MessageAdapter(this.mItems);
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        this.mDataBinding = FragmentChatBinding.inflate(inflater, parent, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        this.setDataBinding(inflater, container);
         if (requireActivity() instanceof MainActivity activity) {
             activity.setSupportActionBar(this.getDataBinding().toolbarChat);
         }
@@ -168,6 +172,9 @@ public class ChatFragment extends BaseFragment {
     private void addMessage(String username, String message) {
         addItem(new ChatMessage.Builder(ChatMessage.TYPE_MESSAGE).setUsername(username).setMessage(message).build());
     }
+    private void addDirect(String username, String message) {
+        addItem(new ChatMessage.Builder(ChatMessage.TYPE_DIRECT).setUsername(username).setMessage(message).build());
+    }
 
     private void addTyping(String username) {
         addItem(new ChatMessage.Builder(ChatMessage.TYPE_ACTION).setUsername(username).build());
@@ -195,9 +202,8 @@ public class ChatFragment extends BaseFragment {
         }
 
         // perform the sending message attempt
-        addMessage(this.mDataBinding.getItem().getUsername(), message);
         mSocket.emit("chat message", message);
-
+        addMessage(this.mDataBinding.getItem().getUsername(), message);
         this.mDataBinding.inputMessage.setText("");
     }
 
@@ -218,7 +224,7 @@ public class ChatFragment extends BaseFragment {
         this.mDataBinding.recyclerviewMessages.scrollToPosition(mAdapter.getItemCount() - 1);
     }
 
-    private final Emitter.Listener onNewMessage = args -> requireActivity().runOnUiThread(() -> {
+    private final Emitter.Listener onChatMessage = args -> requireActivity().runOnUiThread(() -> {
         JSONObject data = (JSONObject) args[0];
         String username;
         String message;
@@ -233,8 +239,20 @@ public class ChatFragment extends BaseFragment {
         addMessage(username, message);
     });
 
-    private final Emitter.Listener onPrivateMessage = args -> requireActivity().runOnUiThread(() -> {
 
+    private final Emitter.Listener onDirectMessage = args -> requireActivity().runOnUiThread(() -> {
+        JSONObject data = (JSONObject) args[0];
+        String username;
+        String message;
+        try {
+            username = data.getString("username");
+            message = data.getString("message");
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));
+            return;
+        }
+        removeTyping(username);
+        addDirect(username, message);
     });
 
     private final Emitter.Listener onUserJoined = args -> requireActivity().runOnUiThread(() -> {
@@ -298,8 +316,19 @@ public class ChatFragment extends BaseFragment {
         mSocket.emit("stop typing");
     };
 
-    /** @noinspection unused */
+    @Override
+    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+
+    }
+
+    @Override
+    protected void setDataBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        this.mDataBinding = FragmentChatBinding.inflate(inflater, container, false);
+    }
+
+    @NonNull
     public FragmentChatBinding getDataBinding() {
         return this.mDataBinding;
     }
+
 }
