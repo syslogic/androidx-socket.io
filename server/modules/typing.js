@@ -1,6 +1,7 @@
+const constants = require("./constants");
 module.exports = (io, socket) => {
 
-    // when the client emits 'typing'
+    // When the client emits 'typing'
     const onStartTyping = () => {
 
         // broadcast globally that the client has started typing
@@ -10,7 +11,7 @@ module.exports = (io, socket) => {
         });
     }
 
-    // when the client emits 'stop typing'
+    // When the client emits 'stop typing'
     const onStopTyping = () => {
 
         // broadcast globally that the client has stopped typing
@@ -20,6 +21,6 @@ module.exports = (io, socket) => {
         });
     }
 
-    socket.on("typing", onStartTyping);
-    socket.on("stop typing", onStopTyping);
+    socket.on(constants.START_TYPING, onStartTyping);
+    socket.on(constants.STOP_TYPING, onStopTyping);
 }

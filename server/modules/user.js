@@ -1,3 +1,5 @@
+const constants = require("./constants");
+
 module.exports = (io, socket) => {
 
     const getParticipants = () => {
@@ -10,29 +12,29 @@ module.exports = (io, socket) => {
         return data;
     }
 
-    // when the client emits 'participants'
+    // When the client emits 'participants'
     const onParticipants = () => {
         let data = getParticipants();
-        socket.emit('participants', {
+        socket.emit(constants.PARTICIPANTS, {
             usercount: data.length,
             data: data
         });
     };
 
-    // when the client connects
+    // When the client connects
     const onConnect = (username) => {
 
         // store the username in the socket session for the client
         socket.data.username = username;
 
-        socket.emit('login', {
+        socket.emit(constants.USER_LOGIN, {
             socketId: socket.id,
             data: getParticipants()
         });
 
         // broadcast globally that the client has joined
         console.log('User %s has connected; socketId %s', socket.data.username, socket.id);
-        socket.broadcast.emit('user joined', {
+        socket.broadcast.emit(constants.USER_JOINED, {
             socketId: socket.id,
             usercount: io.sockets.sockets.size,
             username: socket.data.username
@@ -44,14 +46,14 @@ module.exports = (io, socket) => {
 
         // broadcast globally that the client has disconnected
         console.log('User %s has disconnected; socketId %s', socket.data.username, socket.id);
-        socket.broadcast.emit('user left', {
+        socket.broadcast.emit(constants.USER_LEFT, {
             socketId: socket.id,
             usercount: io.sockets.sockets.size,
             username: socket.data.username
         });
     }
 
-    socket.on("participants", onParticipants);
-    socket.on("disconnect", onDisconnect);
-    socket.on("add user", onConnect);
+    socket.on(constants.PARTICIPANTS, onParticipants);
+    socket.on(constants.DISCONNECT, onDisconnect);
+    socket.on(constants.USER_ADD, onConnect);
 }
