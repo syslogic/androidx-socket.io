@@ -73,6 +73,7 @@ tasks.named("clean") {
 }
 
 tasks.register("startServer", Exec::class.java) {
+    val path: String = rootProject.file("server/scripts").absoluteFile.path
     val os: OperatingSystem = OperatingSystem.current()
     val stdOut = ByteArrayOutputStream()
     val stdErr = ByteArrayOutputStream()
@@ -81,9 +82,9 @@ tasks.register("startServer", Exec::class.java) {
     errorOutput = stdErr
 
     if (os.isUnix || os.isLinux || os.isMacOsX) {
-        commandLine(rootProject.file("server/scripts").absoluteFile.path + "/start_server.sh")
+        commandLine(path + "/start_server.sh")
     } else {
-        commandLine("cmd", "/c", "pwsh -File " + rootProject.file("server/scripts").absoluteFile.path + "/start_server.ps1")
+        commandLine("cmd", "/c", "pwsh -File " + path + "/start_server.ps1")
     }
     doLast {
         if (executionResult.get().exitValue == 0) {

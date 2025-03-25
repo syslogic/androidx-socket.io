@@ -1,5 +1,4 @@
-// noinspection JSUnresolvedReference
-$(function() {
+jQuery(function() {
 
   const FADE_TIME = 150; // ms
   const TYPING_TIMER_LENGTH = 400; // ms
