@@ -78,7 +78,7 @@ public class ChatFragment extends BaseFragment {
         }
         super.onDestroy();
     }
-    
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);

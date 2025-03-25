@@ -5,29 +5,30 @@ const port = process.env.PORT || 3000;
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 const server = require('http').createServer(app);
-const io = require('socket.io') (server, {
+
+server.listen(port, () => {
+    console.log('Server listening at port %d', port);
+});
+
+const io = require('socket.io')(server, {
     transports: ['polling', 'websocket'],
     path: '/socket.io'
 });
 
-server.listen(port, () => {
-    console.log('Listening at port %d', port);
-});
-
-// Chatroom
 let numUsers = 0;
 
-// On connection ...
 io.on('connection', (socket) => {
 
-    console.log('new client has connected from %s', socket.address);
-    socket.join('default');
+    const address = (socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress).replace('::ffff:','');
+    console.info('New client has connected from IP address %s', address);
+    socket.remoteAddress = address;
 
     let addedUser = false;
+    socket.join('default');
 
     // when the client emits 'new message', this listens and executes
     socket.on('new message', (data) => {
-        console.log('user %s wrote: %s', socket.username, data);
+        console.log('User %s wrote: %s', socket.username, data);
         socket.broadcast.emit('new message', {
             username: socket.username,
             message: data
@@ -35,6 +36,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on("private message", (anotherSocketId, message) => {
+        console.log('socketId %s wrote to socketId %s: %s', socket.id, anotherSocketId, message);
         socket.to(anotherSocketId).emit("private message", socket.id, message);
     });
 
@@ -42,7 +44,7 @@ io.on('connection', (socket) => {
     socket.on('add user', (username) => {
 
         if (addedUser) {
-            console.log('user %s was already added', socket.username);
+            console.log('User %s was already added', socket.username);
             socket.emit('login', {
                 usercount: numUsers,
                 socketId: socket.id
@@ -61,7 +63,7 @@ io.on('connection', (socket) => {
         });
 
         // broadcast that a user has connected
-        console.log('user %s has joined; socketId %s', socket.username, socket.id);
+        console.log('User %s has joined; socketId %s', socket.username, socket.id);
         socket.broadcast.emit('user joined', {
             username: socket.username,
             usercount: numUsers
@@ -90,7 +92,7 @@ io.on('connection', (socket) => {
             numUsers--;
 
             // echo globally that this client has left
-            console.log('user %s has left; socketId %s', socket.username, socket.id);
+            console.log('User %s has disconnected; socketId %s', socket.username, socket.id);
             socket.broadcast.emit('user left', {
                 username: socket.username,
                 usercount: numUsers
