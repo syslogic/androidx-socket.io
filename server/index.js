@@ -94,7 +94,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    // when the user disconnects
+    // when the client disconnects
     socket.on('disconnect', () => {
         if (addedUser) {
 
