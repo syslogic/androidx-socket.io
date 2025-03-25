@@ -73,7 +73,9 @@ io.on('connection', (socket) => {
         });
 
         // console.info('%s', io.sockets.sockets);
-        io.sockets.sockets.forEach(logMapElements);
+        io.sockets.sockets.forEach(function logMapElements(socket, socketId) {
+            console.log(`ID ${socketId} -> ${socket.username}`);
+        });
     });
 
     // when the client emits 'typing'
@@ -107,8 +109,3 @@ io.on('connection', (socket) => {
         }
     });
 });
-
-function logMapElements(socket, key, map) {
-    console.log(`${key} ->`);
-    // console.log(socket);
-}
