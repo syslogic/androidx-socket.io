@@ -19,7 +19,7 @@ let numUsers = 0;
 
 io.on('connection', (socket) => {
 
-    // console.log(socket.request.connection._peername);
+    // store the remote connection in the socket session for this client
     socket.remoteAddress = socket.request.connection._peername.address.replace('::ffff:','');
     socket.remotePort = socket.request.connection._peername.port;
     console.info('New client has connected from %s [:%s].', socket.remoteAddress, socket.remotePort);
@@ -53,8 +53,6 @@ io.on('connection', (socket) => {
             return;
         }
 
-        // store the username in the socket session for this client
-        socket.username = username;
         addedUser = true;
         numUsers++;
 
@@ -63,7 +61,10 @@ io.on('connection', (socket) => {
             socketId: socket.id
         });
 
-        // broadcast that a user has connected
+        // store the username in the socket session for this client
+        socket.username = username;
+
+        // broadcast globally that this client has joined
         console.log('User %s has joined; socketId %s', socket.username, socket.id);
         socket.broadcast.emit('user joined', {
             username: socket.username,
@@ -71,15 +72,17 @@ io.on('connection', (socket) => {
         });
     });
 
-    // when the client emits 'typing', broadcast it to others
+    // when the client emits 'typing'
     socket.on('typing', () => {
+        // broadcast globally that this client started typing
         socket.broadcast.emit('typing', {
             username: socket.username
         });
     });
 
-    // when the client emits 'stop typing', broadcast it to others
+    // when the client emits 'stop typing'
     socket.on('stop typing', () => {
+        // broadcast globally that this client stopped typing
         socket.broadcast.emit('stop typing', {
             username: socket.username
         });
@@ -89,15 +92,14 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         if (addedUser) {
 
-            addedUser = false;
-            numUsers--;
-
-            // echo globally that this client has left
+            // broadcast globally that this client disconnected
             console.log('User %s has disconnected; socketId %s', socket.username, socket.id);
             socket.broadcast.emit('user left', {
                 username: socket.username,
                 usercount: numUsers
             });
+            addedUser = false;
+            numUsers--;
         }
     });
 });
