@@ -94,6 +94,14 @@ ul {
 
 /* Font */
 
+.participants {
+  width: 160px;
+  padding-left: 12px;
+  font-size: 150%;
+  height: 100%;
+  float: left;
+}
+
 .messages {
   font-size: 150%;
 }

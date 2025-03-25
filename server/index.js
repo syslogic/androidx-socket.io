@@ -28,7 +28,21 @@ io.on('connection', (socket) => {
     let addedUser = false;
     socket.join('default');
 
-    // when the client emits 'new message', this listens and executes
+
+    // when the client emits 'participants', this listens and executes
+    socket.on("participants", () => {
+        let data = [];
+        io.sockets.sockets.forEach(function(socket, socketId) {
+            data.push({socketId: socketId, username: `${socket.username}`});
+            console.log(`ID ${socketId} -> ${socket.username}`);
+        });
+        socket.emit('participants', {
+            usercount: data.length,
+            data: data
+        });
+    });
+
+    // when the client emits 'new message'
     socket.on('new message', (data) => {
         console.log('User %s wrote: %s', socket.username, data);
         socket.broadcast.emit('new message', {
@@ -37,12 +51,13 @@ io.on('connection', (socket) => {
         });
     });
 
+    // when the client emits 'private message'
     socket.on("private message", (anotherSocketId, message) => {
         console.log('socketId %s wrote to socketId %s: %s', socket.id, anotherSocketId, message);
         socket.to(anotherSocketId).emit("private message", socket.id, message);
     });
 
-    // when the client emits 'add user', this listens and executes
+    // when the client emits 'add user'
     socket.on('add user', (username) => {
 
         if (addedUser) {
@@ -62,25 +77,26 @@ io.on('connection', (socket) => {
             socketId: socket.id
         });
 
-        // store the username in the socket session for this client
+        // store the username in the socket session for the client
         socket.username = username;
 
-        // broadcast globally that this client has joined
+        // broadcast globally that the client has joined
         console.log('User %s has joined; socketId %s', socket.username, socket.id);
         socket.broadcast.emit('user joined', {
             username: socket.username,
             usercount: numUsers
         });
 
-        // console.info('%s', io.sockets.sockets);
+        // list all sockets
         io.sockets.sockets.forEach(function(socket, socketId) {
-            console.log(`ID ${socketId} -> ${socket.username}`);
+            // console.log(`ID ${socketId} -> ${socket.username}`);
         });
     });
 
     // when the client emits 'typing'
     socket.on('typing', () => {
-        // broadcast globally that this client started typing
+
+        // broadcast globally that the client started typing
         socket.broadcast.emit('typing', {
             username: socket.username
         });
@@ -88,7 +104,8 @@ io.on('connection', (socket) => {
 
     // when the client emits 'stop typing'
     socket.on('stop typing', () => {
-        // broadcast globally that this client stopped typing
+
+        // broadcast globally that the client stopped typing
         socket.broadcast.emit('stop typing', {
             username: socket.username
         });
@@ -98,7 +115,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         if (addedUser) {
 
-            // broadcast globally that this client disconnected
+            // broadcast globally that the client disconnected
             console.log('User %s has disconnected; socketId %s', socket.username, socket.id);
             socket.broadcast.emit('user left', {
                 username: socket.username,

@@ -1,6 +1,6 @@
 $(function() {
 
-  const FADE_TIME = 150; // ms
+  const FADE_TIME           = 150; // ms
   const TYPING_TIMER_LENGTH = 400; // ms
   const COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
@@ -11,6 +11,7 @@ $(function() {
   // Initialize variables
   const $window = $(window);
   const $usernameInput = $('.usernameInput'); // Input for username
+  const $participants = $('.participants');   // Participants area
   const $messages = $('.messages');           // Messages area
   const $inputMessage = $('.inputMessage');   // Input message input box
   const $loginPage = $('.login.page');        // The login page
@@ -35,6 +36,18 @@ $(function() {
       message += "There are " + data.usercount + " participants";
     }
     log(message);
+  }
+
+
+  // TODO: update ul.participants
+  const updateParticipants = (response) => {
+    $participants.empty();
+    response.data.forEach((item) => {
+      $participants.append($('<li>')
+          .addClass('participant')
+          .text(item.username)
+      )
+    });
   }
 
   // Sets the client's username
@@ -242,6 +255,14 @@ $(function() {
     // var message = "Welcome to Socket.IO Chat – ";
     // log(message, {prepend: true});
     addParticipantsMessage(data);
+
+    // tell server to execute 'participants'
+    socket.emit('participants');
+  });
+
+  // Whenever the server emits 'participants', update the participants body
+  socket.on('participants', (data) => {
+    updateParticipants(data);
   });
 
   // Whenever the server emits 'new message', update the chat body
