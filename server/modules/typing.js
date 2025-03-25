@@ -1,4 +1,4 @@
-import * as constants from "./constants";
+const constants = require("./constants");
 
 module.exports = (io, socket) => {
 
