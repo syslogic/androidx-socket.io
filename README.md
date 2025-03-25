@@ -1,5 +1,9 @@
-# Socket.IO Chat Server & Client
+## Socket.IO Chat-Server & Clients
 
-This is a simple [Socket.IO](https://github.com/socketio/socket.io) chat-server for NodeJS, with clients for Web and Android. 
+This is a [Socket.IO](https://github.com/socketio/socket.io) chat-server for NodeJS, with clients for Web and Android. 
 
-You can connect to [http://localhost:3000/](http://localhost:3000).
+### Components
+
+- NodeJS [`index.js`](https://github.com/syslogic/androidx-socket.io/blob/master/server/index.js)
+- jQuery [`main.js`](https://github.com/syslogic/androidx-socket.io/blob/master/server/public/main.js)
+- Android [`mobile`](https://github.com/syslogic/androidx-socket.io/tree/master/mobile)
