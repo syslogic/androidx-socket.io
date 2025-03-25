@@ -8,16 +8,6 @@
     app:defaultNavHost="true">
 
     <fragment
-        android:label="LoginFragment"
-        android:id="@+id/loginFragment"
-        android:name="io.syslogic.socketio.fragment.LoginFragment"
-        tools:layout="@layout/fragment_login">
-        <action
-            android:id="@+id/action_loginFragment_to_chatFragment"
-            app:destination="@id/chatFragment"/>
-    </fragment>
-
-    <fragment
         android:label="ChatFragment"
         android:id="@+id/chatFragment"
         android:name="io.syslogic.socketio.fragment.ChatFragment"
@@ -28,18 +18,22 @@
         <action
             android:id="@+id/action_chatFragment_to_socketsDialogFragment"
             app:destination="@id/socketsDialogFragment" />
-        <action
-            android:id="@+id/action_chatFragment_to_loginDialogFragment"
-            app:destination="@id/loginDialogFragment" />
     </fragment>
+
+    <fragment
+        android:label="LoginFragment"
+        android:id="@+id/loginFragment"
+        android:name="io.syslogic.socketio.fragment.LoginFragment"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_chatFragment"
+            app:destination="@id/chatFragment"/>
+    </fragment>
+
     <dialog
         android:id="@+id/socketsDialogFragment"
         android:name="io.syslogic.socketio.dialog.SocketsDialogFragment"
         android:label="dialog_sockets"
-        tools:layout="@layout/dialog_sockets" />
-    <dialog
-        android:id="@+id/loginDialogFragment"
-        android:name="io.syslogic.socketio.dialog.LoginDialogFragment"
-        android:label="LoginDialogFragment" />
+        tools:layout="@layout/dialog_sockets"/>
 
 </navigation>

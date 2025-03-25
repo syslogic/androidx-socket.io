@@ -2,7 +2,7 @@ const constants = require("./constants");
 
 module.exports = (io, socket) => {
 
-    const getParticipants = () => {
+    const getSockets = () => {
         let data = [];
         io.sockets.sockets.forEach(function(socket, socketId) {
             if (typeof socket.data.username === 'undefined') {socket.data.username='default';} // default socket.
@@ -12,10 +12,10 @@ module.exports = (io, socket) => {
         return data;
     }
 
-    // When the client emits 'participants'
-    const onParticipants = () => {
-        let data = getParticipants();
-        socket.emit(constants.PARTICIPANTS, {
+    // When the client emits 'sockets'
+    const onSockets = () => {
+        let data = getSockets();
+        socket.emit(constants.SOCKETS, {
             usercount: data.length,
             data: data
         });
@@ -29,7 +29,7 @@ module.exports = (io, socket) => {
 
         socket.emit(constants.USER_LOGIN, {
             socketId: socket.id,
-            data: getParticipants()
+            data: getSockets()
         });
 
         // broadcast globally that the client has joined
@@ -53,7 +53,7 @@ module.exports = (io, socket) => {
         });
     }
 
-    socket.on(constants.PARTICIPANTS, onParticipants);
+    socket.on(constants.SOCKETS, onSockets);
     socket.on(constants.DISCONNECT, onDisconnect);
     socket.on(constants.USER_ADD, onConnect);
 }

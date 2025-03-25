@@ -34,8 +34,7 @@ public class ChatMenuProvider implements MenuProvider {
     public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.menu_action_leave_chat) {
             MainActivity activity = mContext.get();
-            // activity.getNavController().navigateUp();
-            activity.getNavController().navigate(R.id.action_chatFragment_to_loginDialogFragment);
+            activity.getNavController().navigateUp();
             return true;
         } else if (menuItem.getItemId() == R.id.menu_menu_action_sockets) {
             MainActivity activity = mContext.get();

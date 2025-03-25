@@ -26,6 +26,7 @@ import java.util.Objects;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+import io.syslogic.socketio.Constants;
 import io.syslogic.socketio.R;
 import io.syslogic.socketio.activity.MainActivity;
 import io.syslogic.socketio.databinding.FragmentChatBinding;
@@ -50,19 +51,19 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MainActivity activity = requireMainActivity();
-        this.addFragmentResultListener("login", this, true);
+        this.addFragmentResultListener(Constants.REQUEST_KEY_LOGIN, this, true);
         activity.addChatMenuProvider();
         if (savedInstanceState == null) {
             mSocket = activity.getSocket();
             mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
             mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-            mSocket.on("chat message", this.onChatMessage);
-            mSocket.on("direct message", this.onDirectMessage);
-            mSocket.on("user joined", this.onUserJoined);
-            mSocket.on("user left", this.onUserLeft);
-            mSocket.on("typing", this.onTyping);
-            mSocket.on("stop typing", this.onStopTyping);
+            mSocket.on(Constants.REQUEST_KEY_CHAT_MESSAGE, this.onChatMessage);
+            mSocket.on(Constants.REQUEST_KEY_DIRECT_MESSAGE, this.onDirectMessage);
+            mSocket.on(Constants.REQUEST_KEY_USER_JOINED, this.onUserJoined);
+            mSocket.on(Constants.REQUEST_KEY_USER_LEFT, this.onUserLeft);
+            mSocket.on(Constants.REQUEST_KEY_TYPING_START, this.onTyping);
+            mSocket.on(Constants.REQUEST_KEY_TYPING_STOP, this.onStopTyping);
             if (!mSocket.connected()) {mSocket.connect();}
         }
     }
@@ -73,12 +74,12 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
         mSocket.off(Socket.EVENT_CONNECT, this.onConnect);
         mSocket.off(Socket.EVENT_DISCONNECT, this.onDisconnect);
         mSocket.off(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-        mSocket.off("chat message", this.onChatMessage);
-        mSocket.off("direct message", this.onDirectMessage);
-        mSocket.off("user joined", this.onUserJoined);
-        mSocket.off("user left", this.onUserLeft);
-        mSocket.off("typing", this.onTyping);
-        mSocket.off("stop typing", this.onStopTyping);
+        mSocket.off(Constants.REQUEST_KEY_CHAT_MESSAGE, this.onChatMessage);
+        mSocket.off(Constants.REQUEST_KEY_DIRECT_MESSAGE, this.onDirectMessage);
+        mSocket.off(Constants.REQUEST_KEY_USER_JOINED, this.onUserJoined);
+        mSocket.off(Constants.REQUEST_KEY_USER_LEFT, this.onUserLeft);
+        mSocket.off(Constants.REQUEST_KEY_TYPING_START, this.onTyping);
+        mSocket.off(Constants.REQUEST_KEY_TYPING_STOP, this.onStopTyping);
         leaveRoom(requireMainActivity());
         super.onDestroy();
     }
@@ -119,7 +120,7 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
                 if (!mSocket.connected()) {return;}
                 if (!mTyping) {
                     mTyping = true;
-                    mSocket.emit("typing");
+                    mSocket.emit(Constants.REQUEST_KEY_TYPING_STOP);
                 }
                 mTypingHandler.removeCallbacks(onTypingTimeout);
                 mTypingHandler.postDelayed(onTypingTimeout, TYPING_TIMER_DURATION);
@@ -191,10 +192,8 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
     }
 
     private void attemptSend() {
-
         mTyping = false;
         if (!mSocket.connected()) {return;}
-        Log.d(LOG_TAG, "attempt message send");
         String message = Objects.requireNonNull(this.mDataBinding.inputMessage.getText()).toString().trim();
         if (TextUtils.isEmpty(message)) {
             this.mDataBinding.inputMessage.requestFocus();
@@ -202,7 +201,7 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
         }
 
         // perform the sending message attempt
-        mSocket.emit("chat message", message);
+        mSocket.emit(Constants.REQUEST_KEY_CHAT_MESSAGE, message);
         addMessage(this.mDataBinding.getItem().getUsername(), message);
         this.mDataBinding.inputMessage.setText("");
     }
@@ -211,7 +210,6 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
         activity.getNavController().navigateUp();
     }
 
-    /** TODO ... */
     public void leaveRoom(@NonNull MainActivity activity) {
         if (mSocket != null) {
             mSocket.disconnect();
@@ -313,7 +311,7 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
     private final Runnable onTypingTimeout = () -> {
         if (! mTyping) {return;}
         mTyping = false;
-        mSocket.emit("stop typing");
+        mSocket.emit(Constants.REQUEST_KEY_TYPING_STOP);
     };
 
     @Override

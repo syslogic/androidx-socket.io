@@ -48,9 +48,7 @@ public class LoginFragment extends BaseFragment {
                 mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
                 mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
                 mSocket.on(Constants.REQUEST_KEY_LOGIN, this.onLogin);
-                if (!mSocket.connected()) {
-                    mSocket.connect();
-                }
+                if (!mSocket.connected()) {mSocket.connect();}
             }
         }
     }
@@ -93,8 +91,6 @@ public class LoginFragment extends BaseFragment {
     }
 
     private void attemptLogin() {
-
-        Log.d(LOG_TAG, "attempt login");
 
         AppCompatEditText inputUsername = this.mDataBinding.inputUsername;
 

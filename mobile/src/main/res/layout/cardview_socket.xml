@@ -23,25 +23,42 @@
             android:paddingStart="@dimen/message_padding"
             android:paddingEnd="@dimen/message_padding">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/socketId"
-                style="?android:textAppearanceMedium"
-                android:textColor="?android:textColorSecondary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/avatar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:gravity="start"
-                android:text="@{ item.socketId }"
-                tools:text="@string/tools_text_socket_id"/>
+                android:src="@drawable/baseline_person_24"/>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/username"
-                style="?android:textAppearanceMedium"
-                android:textColor="?android:textColorSecondary"
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
-                android:text="@{ item.username }"
-                tools:text="@string/tools_text_username"/>
+                android:orientation="vertical"
+                android:paddingTop="@dimen/line_padding"
+                android:paddingStart="@dimen/message_padding"
+                android:paddingEnd="@dimen/message_padding">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/username"
+                    style="?android:textAppearanceSmallPopupMenu"
+                    android:textColor="?android:textColorSecondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:text="@{ item.username }"
+                    tools:text="@string/tools_text_username"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/socketId"
+                    style="?android:textAppearanceSmall"
+                    android:textColor="?android:textColorSecondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:text="@{ item.socketId }"
+                    tools:text="@string/tools_text_socket_id"/>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

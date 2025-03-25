@@ -11,7 +11,7 @@ $(function() {
   // Initialize variables
   const $window = $(window);
   const $usernameInput = $('.usernameInput'); // Input for username
-  const $participants = $('.participants');   // Participants area
+  const $sockets = $('.sockets');             // Sockets area
   const $messages = $('.messages');           // Messages area
   const $inputMessage = $('.inputMessage');   // Input message input box
   const $loginPage = $('.login.page');        // The login page
@@ -38,12 +38,12 @@ $(function() {
     log(message);
   }
 
-  // Update ul.participants
-  const updateParticipants = (data) => {
-    $participants.empty();
+  // Update ul.sockets
+  const updateSockets = (data) => {
+    $sockets.empty();
     data.forEach((item) => {
-      $participants.append($('<li>')
-          .addClass('participant')
+      $sockets.append($('<li>')
+          .addClass('socket')
           .text(item.username)
       )
     });
@@ -258,22 +258,21 @@ $(function() {
     // log(message, {prepend: true});
     addParticipantsMessage(response);
 
-    // tell server to execute 'participants'
-    updateParticipants(response.data);
-    // socket.emit('participants');
+    // update the available sockets.
+    updateSockets(response.data);
   });
 
-  // Whenever the server emits 'participants', update the participants body
-  socket.on('participants', (response) => {
-    updateParticipants(response.data);
+  // Whenever the server emits 'sockets', update the sockets body
+  socket.on('sockets', (response) => {
+    updateSockets(response.data);
   });
 
-  // Whenever the server emits 'new message', update the chat body
+  // Whenever the server emits 'chat message', update the chat body
   socket.on('chat message', (data) => {
     addChatMessage(data);
   });
 
-  // Whenever the server emits 'private message', update the chat body
+  // Whenever the server emits 'direct message', update the chat body
   socket.on('direct message', (data) => {
     addPrivateMessage(data);
   });
@@ -292,7 +291,7 @@ $(function() {
   });
 
   // Whenever the server emits 'typing', show the typing message
-  socket.on('typing', (data) => {
+  socket.on('start typing', (data) => {
     addChatTyping(data);
   });
 
