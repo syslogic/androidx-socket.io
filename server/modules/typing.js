@@ -1,4 +1,5 @@
-const constants = require("./constants");
+import * as constants from "./constants";
+
 module.exports = (io, socket) => {
 
     // When the client emits 'typing start'.
