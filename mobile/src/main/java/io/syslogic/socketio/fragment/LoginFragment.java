@@ -147,6 +147,7 @@ public class LoginFragment extends BaseFragment {
 
     protected final Emitter.Listener onLogin = args -> {
 
+        // Store the last username in shared preferences.
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
         prefs.edit().putString("username", this.username).apply();
 
@@ -154,7 +155,6 @@ public class LoginFragment extends BaseFragment {
         try {
             String socketId = data.getString("socketId");
             String usercount = String.valueOf(data.getInt("usercount"));
-
             Log.d(LOG_TAG, "room " + socketId + " has " + usercount + " participants");
             this.gotoChatFragment(socketId, this.username, Integer.parseInt(usercount));
 

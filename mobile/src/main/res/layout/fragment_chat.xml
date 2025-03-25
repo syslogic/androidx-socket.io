@@ -24,7 +24,9 @@
             android:contentInsetStart="0dp"
             android:elevation="4dp"
             android:padding="0dp"
-            app:contentInsetStart="0dp"/>
+            app:titleTextAppearance="@style/Widget.Material3.Toolbar"
+            app:contentInsetStart="0dp"
+            app:menu="@menu/menu_chat"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_messages"

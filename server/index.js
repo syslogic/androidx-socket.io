@@ -23,6 +23,7 @@ io.on('connection', (socket) => {
     socket.remoteAddress = socket.request.connection._peername.address.replace('::ffff:','');
     socket.remotePort = socket.request.connection._peername.port;
     console.info('New client has connected from %s [:%s].', socket.remoteAddress, socket.remotePort);
+    // io.sockets.manager.server.connections
 
     let addedUser = false;
     socket.join('default');
@@ -70,6 +71,9 @@ io.on('connection', (socket) => {
             username: socket.username,
             usercount: numUsers
         });
+
+        // console.info('%s', io.sockets.sockets);
+        io.sockets.sockets.forEach(logMapElements);
     });
 
     // when the client emits 'typing'
@@ -103,3 +107,8 @@ io.on('connection', (socket) => {
         }
     });
 });
+
+function logMapElements(socket, key, map) {
+    console.log(`${key} ->`);
+    // console.log(socket);
+}
