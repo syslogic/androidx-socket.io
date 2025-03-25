@@ -269,12 +269,12 @@ $(function() {
   });
 
   // Whenever the server emits 'new message', update the chat body
-  socket.on('new message', (data) => {
+  socket.on('chat message', (data) => {
     addChatMessage(data);
   });
 
   // Whenever the server emits 'private message', update the chat body
-  socket.on('private message', (data) => {
+  socket.on('direct message', (data) => {
     addPrivateMessage(data);
   });
 
