@@ -1,5 +1,5 @@
 # socket.io Chat Server & Client
 
-This is a simple [socket.io](https://github.com/socketio/socket.io) chat demo for NodeJS and Android. 
+This is a simple [socket.io](https://github.com/socketio/socket.io) chat-server for NodeJS, with clients for Web and Android. 
 
-You can connect to [http://192.168.1.1:3000/](http://192.168.1.1:3000).
+You can connect to [http://localhost:3000/](http://localhost:3000).
