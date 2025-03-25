@@ -15,7 +15,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import io.socket.client.Socket;
-import io.syslogic.socketio.activity.MainActivity;
+import io.syslogic.socketio.MainActivity;
 import io.syslogic.socketio.model.ClientSocket;
 
 /**

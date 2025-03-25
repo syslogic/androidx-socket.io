@@ -5,7 +5,6 @@ import androidx.test.espresso.Espresso;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.matcher.ViewMatchers;
 
-import io.syslogic.socketio.activity.MainActivity;
 import io.syslogic.socketio.base.BaseActivityTest;
 import io.syslogic.socketio.fragment.ChatFragment;
 

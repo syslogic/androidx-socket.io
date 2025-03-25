@@ -1,4 +1,4 @@
-package io.syslogic.socketio.activity;
+package io.syslogic.socketio;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +20,6 @@ import java.util.Objects;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 
-import io.syslogic.socketio.R;
 import io.syslogic.socketio.databinding.FragmentNavHostBinding;
 import io.syslogic.socketio.fragment.BaseFragment;
 import io.syslogic.socketio.menu.ChatMenuProvider;

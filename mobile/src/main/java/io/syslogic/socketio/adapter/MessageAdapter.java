@@ -1,4 +1,4 @@
-package io.syslogic.socketio.recyclerview;
+package io.syslogic.socketio.adapter;
 
 import static io.syslogic.socketio.model.ChatMessage.TYPE_ACTION;
 import static io.syslogic.socketio.model.ChatMessage.TYPE_LOG;
@@ -22,15 +22,19 @@ import io.syslogic.socketio.model.ChatMessage;
  * @author Martin Zeitler
  */
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
-    private final ArrayList<ChatMessage> mItems;
+    private ArrayList<ChatMessage> mItems = new ArrayList<>();
 
     public MessageAdapter(@NonNull ArrayList<ChatMessage> items) {
         this.mItems = items;
     }
 
+    public MessageAdapter() {
+
+    }
+
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return this.mItems.size();
     }
 
     @Override
@@ -59,7 +63,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     }
 
     private ChatMessage getItem(int position) {
-        return mItems.get(position);
+        return this.mItems.get(position);
+    }
+
+    public void addItem(ChatMessage item) {
+        this.mItems.add(item);
+        this.notifyItemInserted(this.getItemCount() - 1);
+    }
+    public void removeItem(int position) {
+        this.mItems.remove(position);
+        this.notifyItemRemoved(position);
+    }
+
+    public ChatMessage getItemAt(int position) {
+        return this.mItems.get(position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

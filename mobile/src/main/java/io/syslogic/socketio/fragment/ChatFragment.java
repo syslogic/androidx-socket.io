@@ -1,6 +1,5 @@
 package io.syslogic.socketio.fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,7 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 import io.socket.client.Socket;
@@ -28,11 +26,11 @@ import io.socket.emitter.Emitter;
 
 import io.syslogic.socketio.Constants;
 import io.syslogic.socketio.R;
-import io.syslogic.socketio.activity.MainActivity;
+import io.syslogic.socketio.MainActivity;
 import io.syslogic.socketio.databinding.FragmentChatBinding;
 import io.syslogic.socketio.model.ChatMessage;
 import io.syslogic.socketio.model.ChatRoom;
-import io.syslogic.socketio.recyclerview.MessageAdapter;
+import io.syslogic.socketio.adapter.MessageAdapter;
 
 /**
  * Chat {@link BaseFragment}
@@ -41,8 +39,6 @@ import io.syslogic.socketio.recyclerview.MessageAdapter;
 public class ChatFragment extends BaseFragment implements FragmentResultListener {
     private static final String LOG_TAG = ChatFragment.class.getSimpleName();
     private FragmentChatBinding mDataBinding = null;
-    private final ArrayList<ChatMessage> mItems = new ArrayList<>();
-    private MessageAdapter mAdapter;
     private static final int TYPING_TIMER_DURATION = 600;
     private final Handler mTypingHandler = new Handler(Looper.getMainLooper());
     private boolean mTyping = false;
@@ -85,12 +81,6 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        this.mAdapter = new MessageAdapter(this.mItems);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         this.setDataBinding(inflater, container);
         if (requireActivity() instanceof MainActivity activity) {
@@ -98,7 +88,7 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
         }
 
         this.mDataBinding.recyclerviewMessages.setLayoutManager(new LinearLayoutManager(requireContext()));
-        this.mDataBinding.recyclerviewMessages.setAdapter(this.mAdapter);
+        this.mDataBinding.recyclerviewMessages.setAdapter(new MessageAdapter());
 
         this.mDataBinding.buttonSend.setOnClickListener(view -> {
             attemptSend();
@@ -161,9 +151,12 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
     }
 
     private void addItem(ChatMessage item) {
-        this.mItems.add(item);
-        mAdapter.notifyItemInserted(this.mItems.size() - 1);
+        getRecyclerViewAdapter().addItem(item);
         scrollToBottom();
+    }
+
+    private MessageAdapter getRecyclerViewAdapter() {
+        return ((MessageAdapter) this.mDataBinding.recyclerviewMessages.getAdapter());
     }
 
     private void addLog(String message) {
@@ -182,11 +175,11 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
     }
 
     private void removeTyping(String username) {
-        for (int i = this.mItems.size() - 1; i >= 0; i--) {
-            ChatMessage message = this.mItems.get(i);
+        MessageAdapter adapter = getRecyclerViewAdapter();
+        for (int i = adapter.getItemCount() - 1; i >= 0; i--) {
+            ChatMessage message = adapter.getItemAt(i);
             if (message.getType() == ChatMessage.TYPE_ACTION && message.getUsername().equals(username)) {
-                this.mItems.remove(i);
-                mAdapter.notifyItemRemoved(i);
+                adapter.removeItem(i);
             }
         }
     }
@@ -219,7 +212,8 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
     }
 
     private void scrollToBottom() {
-        this.mDataBinding.recyclerviewMessages.scrollToPosition(mAdapter.getItemCount() - 1);
+        this.mDataBinding.recyclerviewMessages
+                .scrollToPosition(getRecyclerViewAdapter().getItemCount() - 1);
     }
 
     private final Emitter.Listener onChatMessage = args -> requireActivity().runOnUiThread(() -> {

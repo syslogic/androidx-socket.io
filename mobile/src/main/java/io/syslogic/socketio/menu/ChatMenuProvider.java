@@ -10,8 +10,7 @@ import androidx.core.view.MenuProvider;
 import java.lang.ref.WeakReference;
 
 import io.syslogic.socketio.R;
-import io.syslogic.socketio.activity.MainActivity;
-import io.syslogic.socketio.fragment.BaseFragment;
+import io.syslogic.socketio.MainActivity;
 
 /**
  * Chat {@link MenuProvider}

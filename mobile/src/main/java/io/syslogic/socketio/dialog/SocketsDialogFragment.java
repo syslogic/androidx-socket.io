@@ -22,7 +22,7 @@ import io.socket.emitter.Emitter;
 import io.syslogic.socketio.Constants;
 import io.syslogic.socketio.databinding.DialogSocketsBinding;
 import io.syslogic.socketio.model.ClientSocket;
-import io.syslogic.socketio.recyclerview.SocketAdapter;
+import io.syslogic.socketio.adapter.SocketAdapter;
 
 /**
  * Sockets {@link BaseDialogFragment}

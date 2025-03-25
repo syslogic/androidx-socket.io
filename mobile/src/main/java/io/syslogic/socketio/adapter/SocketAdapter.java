@@ -1,4 +1,4 @@
-package io.syslogic.socketio.recyclerview;
+package io.syslogic.socketio.adapter;
 
 // import static io.syslogic.socketio.model.ChatUser.TYPE_DEFAULT;
 import static io.syslogic.socketio.model.ClientSocket.TYPE_OPERATOR;

@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 
 import java.lang.ref.WeakReference;
 
-import io.syslogic.socketio.activity.MainActivity;
+import io.syslogic.socketio.MainActivity;
 
 /**
  * Abstract {@link TestCase} for {@link MainActivity}.

@@ -23,7 +23,7 @@ import io.socket.engineio.client.EngineIOException;
 
 import io.syslogic.socketio.Constants;
 import io.syslogic.socketio.R;
-import io.syslogic.socketio.activity.MainActivity;
+import io.syslogic.socketio.MainActivity;
 import io.syslogic.socketio.model.ClientSocket;
 
 /**
