@@ -30,10 +30,10 @@ $(function() {
 
   const addParticipantsMessage = (data) => {
     let message = '';
-    if (data.usercount === 1) {
+    if (data.data.length === 1) {
       message += "There's 1 participant";
     } else {
-      message += "There are " + data.usercount + " participants";
+      message += "There are " + data.data.length + " participants";
     }
     log(message);
   }

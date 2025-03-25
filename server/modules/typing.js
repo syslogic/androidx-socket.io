@@ -5,6 +5,7 @@ module.exports = (io, socket) => {
 
         // broadcast globally that the client has started typing
         socket.broadcast.emit('typing', {
+            socketId: socket.id,
             username: socket.data.username
         });
     }
@@ -14,6 +15,7 @@ module.exports = (io, socket) => {
 
         // broadcast globally that the client has stopped typing
         socket.broadcast.emit('stop typing', {
+            socketId: socket.id,
             username: socket.data.username
         });
     }

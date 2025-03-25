@@ -103,7 +103,6 @@ public class LoginFragment extends BaseFragment {
             return;
         } else {
             inputUsername.setText(username); // trimmed.
-            // inputUsername.setEnabled(false);
         }
 
         // perform the login attempt
@@ -119,9 +118,8 @@ public class LoginFragment extends BaseFragment {
             this.mDataBinding.setConnection(message);
             this.mDataBinding.executePendingBindings();
         }
-
-        // inputUsername.setEnabled(true);
     }
+
     @NonNull
     private ArrayList<ChatUser> parseParticipants(@NonNull JSONArray data) {
         ArrayList<ChatUser> items = new ArrayList<>();

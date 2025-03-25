@@ -33,6 +33,7 @@ module.exports = (io, socket) => {
         // broadcast globally that the client has joined
         console.log('User %s has connected; socketId %s', socket.data.username, socket.id);
         socket.broadcast.emit('user joined', {
+            socketId: socket.id,
             usercount: io.sockets.sockets.size,
             username: socket.data.username
         });
@@ -44,6 +45,7 @@ module.exports = (io, socket) => {
         // broadcast globally that the client has disconnected
         console.log('User %s has disconnected; socketId %s', socket.data.username, socket.id);
         socket.broadcast.emit('user left', {
+            socketId: socket.id,
             usercount: io.sockets.sockets.size,
             username: socket.data.username
         });
