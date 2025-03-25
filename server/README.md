@@ -15,17 +15,17 @@ A simple chat-server built with the Socket.IO library.
 - A listing of participants is being sent upon login.
 - Direct messages from socket to socket are being supported.
 
-### Linux Bash Scripts
-
-- [`scripts/check_port.sh`](https://github.com/syslogic/androidx-socket.io/blob/master/server/scripts/check_port.sh)
-- [`scripts/start_server.sh`](https://github.com/syslogic/androidx-socket.io/blob/master/server/scripts/start_server.sh)
-- [`scripts/stop_server.sh`](https://github.com/syslogic/androidx-socket.io/blob/master/server/scripts/stop_server.sh)
-
 ### Windows Powershell 7 Scripts
 
 - [`scripts/check_port.ps1`](https://github.com/syslogic/androidx-socket.io/blob/master/server/scripts/check_port.ps1)
 - [`scripts/start_server.ps1`](https://github.com/syslogic/androidx-socket.io/blob/master/server/scripts/start_server.ps1)
 - [`scripts/stop_server.ps1`](https://github.com/syslogic/androidx-socket.io/blob/master/server/scripts/stop_server.ps1)
+
+### Linux Bash Scripts
+
+- [`scripts/check_port.sh`](https://github.com/syslogic/androidx-socket.io/blob/master/server/scripts/check_port.sh)
+- [`scripts/start_server.sh`](https://github.com/syslogic/androidx-socket.io/blob/master/server/scripts/start_server.sh)
+- [`scripts/stop_server.sh`](https://github.com/syslogic/androidx-socket.io/blob/master/server/scripts/stop_server.sh)
 
 ### Environmental Variables
 
