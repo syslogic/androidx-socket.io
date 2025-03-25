@@ -47,7 +47,7 @@ public class ChatFragment extends BaseFragment implements FragmentResultListener
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MainActivity activity = requireMainActivity();
-        this.addFragmentResultListener(Constants.REQUEST_KEY_LOGIN, this, true);
+        this.addFragmentResultListener(Constants.REQUEST_KEY_USER_LOGIN, this, true);
         activity.addChatMenuProvider();
         if (savedInstanceState == null) {
             mSocket = activity.getSocket();

@@ -47,7 +47,7 @@ public class LoginFragment extends BaseFragment {
                 mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
                 mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
                 mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-                mSocket.on(Constants.REQUEST_KEY_LOGIN, this.onLogin);
+                mSocket.on(Constants.REQUEST_KEY_USER_LOGIN, this.onLogin);
                 if (!mSocket.connected()) {mSocket.connect();}
             }
         }
@@ -86,7 +86,7 @@ public class LoginFragment extends BaseFragment {
         mSocket.off(Socket.EVENT_CONNECT, this.onConnect);
         mSocket.off(Socket.EVENT_DISCONNECT, this.onDisconnect);
         mSocket.off(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-        mSocket.off(Constants.REQUEST_KEY_LOGIN, this.onLogin);
+        mSocket.off(Constants.REQUEST_KEY_USER_LOGIN, this.onLogin);
         super.onDestroy();
     }
 
@@ -112,7 +112,7 @@ public class LoginFragment extends BaseFragment {
         if (mSocket != null && mSocket.connected()) {
 
             // add the login emitter, before logging in.
-            mSocket.on(Constants.REQUEST_KEY_LOGIN, this.onLogin);
+            mSocket.on(Constants.REQUEST_KEY_USER_LOGIN, this.onLogin);
             mSocket.emit(Constants.REQUEST_KEY_USER_ADD, username);
 
         } else {
@@ -162,7 +162,7 @@ public class LoginFragment extends BaseFragment {
             Log.d(LOG_TAG, "room " + socketId + " has " + items.size() + " participants");
 
             // remove the emitter, else it will login endlessly.
-            mSocket.off(Constants.REQUEST_KEY_LOGIN, this.onLogin);
+            mSocket.off(Constants.REQUEST_KEY_USER_LOGIN, this.onLogin);
 
             this.gotoChatFragment(socketId, this.username, items.size());
 

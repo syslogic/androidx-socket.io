@@ -62,7 +62,7 @@ public class SocketsDialogFragment extends BaseDialogFragment {
             Log.d(LOG_TAG, usercount + " sockets active");
 
             // remove the "sockets" emitter again.
-            getSocket().off(Constants.REQUEST_KEY_LOGIN, this.onSockets);
+            getSocket().off(Constants.REQUEST_KEY_USER_LOGIN, this.onSockets);
 
             requireMainActivity().runOnUiThread(() -> {
                 this.getDataBinding().recyclerviewSockets.setAdapter(new SocketAdapter(items));

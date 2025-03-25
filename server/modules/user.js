@@ -12,7 +12,7 @@ module.exports = (io, socket) => {
         return data;
     }
 
-    // When the client emits 'sockets'
+    // When the client emits 'sockets'.
     const onSockets = () => {
         let data = getSockets();
         socket.emit(constants.SOCKETS, {
@@ -21,10 +21,10 @@ module.exports = (io, socket) => {
         });
     };
 
-    // When the client connects
-    const onConnect = (username) => {
+    // When the client connects.
+    const onClientConnected = (username) => {
 
-        // store the username in the socket session for the client
+        // Store the username in the socket session for the client.
         socket.data.username = username;
 
         socket.emit(constants.USER_LOGIN, {
@@ -32,19 +32,19 @@ module.exports = (io, socket) => {
             data: getSockets()
         });
 
-        // broadcast globally that the client has joined
+        // Broadcast globally that the client has joined.
         console.log('User %s has connected; socketId %s', socket.data.username, socket.id);
         socket.broadcast.emit(constants.USER_JOINED, {
             socketId: socket.id,
-            usercount: io.sockets.sockets.size,
-            username: socket.data.username
+            username: socket.data.username,
+            usercount: io.sockets.sockets.size
         });
     }
 
-    // when the client disconnects
+    // When the client disconnects.
     const onDisconnect = () => {
 
-        // broadcast globally that the client has disconnected
+        // Broadcast globally that the client has disconnected.
         console.log('User %s has disconnected; socketId %s', socket.data.username, socket.id);
         socket.broadcast.emit(constants.USER_LEFT, {
             socketId: socket.id,
@@ -53,7 +53,7 @@ module.exports = (io, socket) => {
         });
     }
 
-    socket.on(constants.SOCKETS, onSockets);
+    socket.on(constants.USER_ADD, onClientConnected);
     socket.on(constants.DISCONNECT, onDisconnect);
-    socket.on(constants.USER_ADD, onConnect);
+    socket.on(constants.SOCKETS, onSockets);
 }
