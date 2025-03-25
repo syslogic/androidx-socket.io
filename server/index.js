@@ -19,9 +19,10 @@ let numUsers = 0;
 
 io.on('connection', (socket) => {
 
-    const address = (socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress).replace('::ffff:','');
-    console.info('New client has connected from IP address %s', address);
-    socket.remoteAddress = address;
+    // console.log(socket.request.connection._peername);
+    socket.remoteAddress = socket.request.connection._peername.address.replace('::ffff:','');
+    socket.remotePort = socket.request.connection._peername.port;
+    console.info('New client has connected from %s [:%s].', socket.remoteAddress, socket.remotePort);
 
     let addedUser = false;
     socket.join('default');
