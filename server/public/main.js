@@ -1,4 +1,4 @@
-jQuery(function() {
+$(function() {
 
   const FADE_TIME = 150; // ms
   const TYPING_TIMER_LENGTH = 400; // ms
@@ -21,7 +21,10 @@ jQuery(function() {
   let connected = false;
   let typing = false;
   let lastTypingTime;
+
   let $currentInput = $usernameInput.focus();
+
+  // noinspection JSUnresolvedReference
   const socket = io();
 
   const addParticipantsMessage = (data) => {
@@ -44,6 +47,7 @@ jQuery(function() {
       $chatPage.show();
       $loginPage.off('click');
       $currentInput = $inputMessage.focus();
+      $inputMessage.focus();
 
       // Tell the server your username
       socket.emit('add user', username);
@@ -107,7 +111,7 @@ jQuery(function() {
 
   // Removes the visual chat typing message
   const removeChatTyping = (data) => {
-    getTypingMessages(data).fadeOut(function () {
+    getTypingMessages(data).fadeOut(function() {
       $(this).remove();
     });
   }
@@ -118,6 +122,7 @@ jQuery(function() {
   // options.prepend - If the element should prepend
   //   all other messages (default = false)
   const addMessageElement = (el, options) => {
+
     const $el = $(el);
 
     // Setup default options
