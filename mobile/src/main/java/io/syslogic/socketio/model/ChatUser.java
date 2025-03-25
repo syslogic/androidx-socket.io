@@ -1,8 +1,9 @@
 package io.syslogic.socketio.model;
 
+import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 
-public class ChatUser {
+public class ChatUser extends BaseObservable {
     private final String socketId;
     private final String username;
 
