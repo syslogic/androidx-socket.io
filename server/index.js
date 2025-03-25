@@ -73,7 +73,7 @@ io.on('connection', (socket) => {
         });
 
         // console.info('%s', io.sockets.sockets);
-        io.sockets.sockets.forEach(function logMapElements(socket, socketId) {
+        io.sockets.sockets.forEach(function(socket, socketId) {
             console.log(`ID ${socketId} -> ${socket.username}`);
         });
     });
