@@ -72,16 +72,22 @@ $(function() {
   }
 
   // Log a message
-    const log = (message, options) => {
-      const $el = $('<li>').addClass('log').text(message);
-      addMessageElement($el, options);
+  const log = (message, options) => {
+    const $el = $('<li>').addClass('log').text(message);
+    addMessageElement($el, options);
+  }
+
+  // TODO: Whenever the server emits 'private message', update the chat body
+  const addPrivateMessage = (data) => {
+    addChatMessage(data, { private: true });
   }
 
   // Adds the visual chat message to the message list
   const addChatMessage = (data, options) => {
+
     // Don't fade the message in if there is an 'X was typing'
     const $typingMessages = getTypingMessages(data);
-    options = options || {};
+    options = options || { private: false };
     if ($typingMessages.length !== 0) {
       options.fade = false;
       $typingMessages.remove();
@@ -93,8 +99,9 @@ $(function() {
     const $messageBodyDiv = $('<span class="messageBody">')
         .text(data.message);
 
+    const messageClass = options.private ? "message private" : "message";
     const typingClass = data.typing ? 'typing' : '';
-    const $messageDiv = $('<li class="message"/>')
+    const $messageDiv = $('<li class="' + messageClass +'"/>')
         .data('username', data.username)
         .addClass(typingClass)
         .append($usernameDiv, $messageBodyDiv);
@@ -119,8 +126,7 @@ $(function() {
   // Adds a message element to the messages and scrolls to the bottom
   // el - The element to add as a message
   // options.fade - If the element should fade-in (default = true)
-  // options.prepend - If the element should prepend
-  //   all other messages (default = false)
+  // options.prepend - If the element should prepend all other messages (default = false)
   const addMessageElement = (el, options) => {
 
     const $el = $(el);
@@ -243,9 +249,9 @@ $(function() {
     addChatMessage(data);
   });
 
-  // TODO: Whenever the server emits 'private message', update the chat body
+  // Whenever the server emits 'private message', update the chat body
   socket.on('private message', (data) => {
-    addChatMessage(data);
+    addPrivateMessage(data);
   });
 
   // Whenever the server emits 'user joined', log it in the chat body
