@@ -96,12 +96,17 @@ ul {
 
 .participants {
   width: 160px;
-  padding-left: 12px;
-  font-size: 150%;
+  padding: 10px 10px 10px 10px;
+  font-size: 120%;
   height: 100%;
   float: left;
+  color: gray;
+  border-right: 2px solid #F78B00;
 }
 
+.participants li {
+  width: 100%;
+}
 .messages {
   font-size: 150%;
 }

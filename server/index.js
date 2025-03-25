@@ -17,9 +17,18 @@ const io = require('socket.io')(server, {
 
 let numUsers = 0;
 
+const getParticipants = () => {
+    let data = [];
+    io.sockets.sockets.forEach(function(socket, socketId) {
+        console.log(`ID: ${socketId} -> Name: ${socket.data.username}`);
+        data.push({socketId: socketId, username: socket.data.username});
+    });
+    return data;
+}
+
 io.on('connection', (socket) => {
 
-    // store the remote connection in the socket session for this client
+    // store the remote connection in the socket session for the client
     socket.remoteAddress = socket.request.connection._peername.address.replace('::ffff:','');
     socket.remotePort = socket.request.connection._peername.port;
     console.info('New client has connected from %s [:%s].', socket.remoteAddress, socket.remotePort);
@@ -28,14 +37,9 @@ io.on('connection', (socket) => {
     let addedUser = false;
     socket.join('default');
 
-
-    // when the client emits 'participants', this listens and executes
+    // when the client emits 'participants'
     socket.on("participants", () => {
-        let data = [];
-        io.sockets.sockets.forEach(function(socket, socketId) {
-            data.push({socketId: socketId, username: `${socket.username}`});
-            console.log(`ID ${socketId} -> ${socket.username}`);
-        });
+        let data = getParticipants();
         socket.emit('participants', {
             usercount: data.length,
             data: data
@@ -44,9 +48,9 @@ io.on('connection', (socket) => {
 
     // when the client emits 'new message'
     socket.on('new message', (data) => {
-        console.log('User %s wrote: %s', socket.username, data);
+        console.log('User %s wrote: %s', socket.data.username, data);
         socket.broadcast.emit('new message', {
-            username: socket.username,
+            username: socket.data.username,
             message: data
         });
     });
@@ -61,53 +65,46 @@ io.on('connection', (socket) => {
     socket.on('add user', (username) => {
 
         if (addedUser) {
-            console.log('User %s was already added', socket.username);
-            socket.emit('login', {
-                usercount: numUsers,
-                socketId: socket.id
-            });
+            console.log('User %s was already added, rejoining %s', socket.data.username, socket.id);
+            socket.emit('login', {usercount: numUsers, socketId: socket.id, data: getParticipants()});
             return;
         }
 
         addedUser = true;
         numUsers++;
 
+        // store the username in the socket session for the client
+        socket.data.username = username;
+
         socket.emit('login', {
             usercount: numUsers,
-            socketId: socket.id
+            socketId: socket.id,
+            data: getParticipants()
         });
-
-        // store the username in the socket session for the client
-        socket.username = username;
 
         // broadcast globally that the client has joined
-        console.log('User %s has joined; socketId %s', socket.username, socket.id);
+        console.log('User %s has connected; socketId %s', socket.data.username, socket.id);
         socket.broadcast.emit('user joined', {
-            username: socket.username,
+            username: socket.data.username,
             usercount: numUsers
-        });
-
-        // list all sockets
-        io.sockets.sockets.forEach(function(socket, socketId) {
-            // console.log(`ID ${socketId} -> ${socket.username}`);
         });
     });
 
     // when the client emits 'typing'
     socket.on('typing', () => {
 
-        // broadcast globally that the client started typing
+        // broadcast globally that the client has started typing
         socket.broadcast.emit('typing', {
-            username: socket.username
+            username: socket.data.username
         });
     });
 
     // when the client emits 'stop typing'
     socket.on('stop typing', () => {
 
-        // broadcast globally that the client stopped typing
+        // broadcast globally that the client has stopped typing
         socket.broadcast.emit('stop typing', {
-            username: socket.username
+            username: socket.data.username
         });
     });
 
@@ -115,10 +112,10 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         if (addedUser) {
 
-            // broadcast globally that the client disconnected
-            console.log('User %s has disconnected; socketId %s', socket.username, socket.id);
+            // broadcast globally that the client has disconnected
+            console.log('User %s has disconnected; socketId %s', socket.data.username, socket.id);
             socket.broadcast.emit('user left', {
-                username: socket.username,
+                username: socket.data.username,
                 usercount: numUsers
             });
             addedUser = false;

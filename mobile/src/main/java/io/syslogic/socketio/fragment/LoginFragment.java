@@ -12,9 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.preference.PreferenceManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import io.socket.client.Socket;
@@ -23,6 +25,7 @@ import io.socket.emitter.Emitter;
 import io.syslogic.socketio.R;
 import io.syslogic.socketio.activity.MainActivity;
 import io.syslogic.socketio.databinding.FragmentLoginBinding;
+import io.syslogic.socketio.model.ChatUser;
 
 public class LoginFragment extends BaseFragment {
     private static final String LOG_TAG = LoginFragment.class.getSimpleName();
@@ -119,6 +122,21 @@ public class LoginFragment extends BaseFragment {
 
         // inputUsername.setEnabled(true);
     }
+    @NonNull
+    private ArrayList<ChatUser> parseParticipants(@NonNull JSONArray data) {
+        ArrayList<ChatUser> items = new ArrayList<>();
+        try {
+            for (int i=0; i < data.length(); i++) {
+                JSONObject item = data.getJSONObject(i);
+                String socketId = item.getString("socketId");
+                String username = item.getString("username");
+                items.add(new ChatUser.Builder().setSocketId(socketId).setUsername(username).build());
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return items;
+    }
 
     private void gotoChatFragment(String socketId, String username, int usercount) {
 
@@ -154,12 +172,15 @@ public class LoginFragment extends BaseFragment {
         JSONObject data = (JSONObject) args[0];
         try {
             String socketId = data.getString("socketId");
-            String usercount = String.valueOf(data.getInt("usercount"));
-            Log.d(LOG_TAG, "room " + socketId + " has " + usercount + " participants");
-            this.gotoChatFragment(socketId, this.username, Integer.parseInt(usercount));
+            JSONArray participants = data.getJSONArray("data");
+            ArrayList<ChatUser> items = this.parseParticipants(participants);
+
+            Log.d(LOG_TAG, "room " + socketId + " has " + items.size() + " participants");
 
             // remove the emitter, else it will login endlessly.
             mSocket.off("login", this.onLogin);
+
+            this.gotoChatFragment(socketId, this.username, items.size());
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, Objects.requireNonNull(e.getMessage()));

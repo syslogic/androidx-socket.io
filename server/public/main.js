@@ -38,11 +38,10 @@ $(function() {
     log(message);
   }
 
-
-  // TODO: update ul.participants
-  const updateParticipants = (response) => {
+  // Update ul.participants
+  const updateParticipants = (data) => {
     $participants.empty();
-    response.data.forEach((item) => {
+    data.forEach((item) => {
       $participants.append($('<li>')
           .addClass('participant')
           .text(item.username)
@@ -70,8 +69,10 @@ $(function() {
   // Sends a chat message
   const sendMessage = () => {
     let message = $inputMessage.val();
+
     // Prevent markup from being injected into the message
     message = cleanInput(message);
+
     // if there is a non-empty message and a socket connection
     if (message && connected) {
       $inputMessage.val('');
@@ -79,6 +80,7 @@ $(function() {
         username: username,
         message: message
       });
+
       // tell server to execute 'new message' and send along one parameter
       socket.emit('new message', message);
     }
@@ -90,7 +92,7 @@ $(function() {
     addMessageElement($el, options);
   }
 
-  // TODO: Whenever the server emits 'private message', update the chat body
+  // Whenever the server emits 'private message', update the chat body
   const addPrivateMessage = (data) => {
     addChatMessage(data, { private: true });
   }
@@ -249,20 +251,21 @@ $(function() {
   // Socket events
 
   // Whenever the server emits 'login', log the login message
-  socket.on('login', (data) => {
+  socket.on('login', (response) => {
     connected = true;
     // Display the welcome message
     // var message = "Welcome to Socket.IO Chat – ";
     // log(message, {prepend: true});
-    addParticipantsMessage(data);
+    addParticipantsMessage(response);
 
     // tell server to execute 'participants'
-    socket.emit('participants');
+    updateParticipants(response.data);
+    // socket.emit('participants');
   });
 
   // Whenever the server emits 'participants', update the participants body
-  socket.on('participants', (data) => {
-    updateParticipants(data);
+  socket.on('participants', (response) => {
+    updateParticipants(response.data);
   });
 
   // Whenever the server emits 'new message', update the chat body
