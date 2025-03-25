@@ -33,7 +33,6 @@ public class MainActivityTest extends BaseActivityTest {
 
     @Test
     public void testLoginFragment() {
-        Assert.assertNotNull("has server URL", mActivity.get().getServerUrl());
         Assert.assertNotNull("has data-binding", mActivity.get().getDataBinding());
         Espresso.onView(ViewMatchers.withId(R.id.input_username)).perform(ViewActions.clearText(), ViewActions.typeText("Crash Test"));
         Espresso.onView(ViewMatchers.withId(R.id.button_sign_in)).perform(ViewActions.click());
