@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:text="@{ item.username }"
-                tools:text="@string/text_username"
+                tools:text="@string/tools_text_username"
                 tools:textColor="@color/username8"/>
 
             <androidx.appcompat.widget.AppCompatTextView

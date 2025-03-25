@@ -65,7 +65,7 @@
                     android:textColor="@color/username5"
                     android:text="@{ connection }"
                     android:textStyle="bold"
-                    tools:text="@string/text_socket_id"/>
+                    tools:text="@string/tools_text_socket_id"/>
 
                 <!--  android:onClick="attemptLogin" -->
                 <androidx.appcompat.widget.AppCompatButton

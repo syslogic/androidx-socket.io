@@ -29,13 +29,13 @@ import io.syslogic.socketio.activity.MainActivity;
 import io.syslogic.socketio.databinding.FragmentChatBinding;
 import io.syslogic.socketio.model.ChatMessage;
 import io.syslogic.socketio.model.ChatRoom;
-import io.syslogic.socketio.recyclerview.ChatAdapter;
+import io.syslogic.socketio.recyclerview.ChatMessageAdapter;
 
 public class ChatFragment extends BaseFragment {
     private static final String LOG_TAG = ChatFragment.class.getSimpleName();
     private FragmentChatBinding mDataBinding = null;
     private final ArrayList<ChatMessage> mItems = new ArrayList<>();
-    private ChatAdapter mAdapter;
+    private ChatMessageAdapter mAdapter;
     private static final int TYPING_TIMER_DURATION = 600;
     private final Handler mTypingHandler = new Handler(Looper.getMainLooper());
     private boolean mTyping = false;
@@ -50,8 +50,8 @@ public class ChatFragment extends BaseFragment {
                 mSocket.on(Socket.EVENT_CONNECT, this.onConnect);
                 mSocket.on(Socket.EVENT_DISCONNECT, this.onDisconnect);
                 mSocket.on(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-                mSocket.on("new message", this.onNewMessage);
-                mSocket.on("private message", this.onPrivateMessage);
+                mSocket.on("chat message", this.onNewMessage);
+                mSocket.on("direct message", this.onPrivateMessage);
                 mSocket.on("user joined", this.onUserJoined);
                 mSocket.on("user left", this.onUserLeft);
                 mSocket.on("typing", this.onTyping);
@@ -66,8 +66,8 @@ public class ChatFragment extends BaseFragment {
         mSocket.off(Socket.EVENT_CONNECT, this.onConnect);
         mSocket.off(Socket.EVENT_DISCONNECT, this.onDisconnect);
         mSocket.off(Socket.EVENT_CONNECT_ERROR, this.onConnectError);
-        mSocket.off("new message", this.onNewMessage);
-        mSocket.off("private message", this.onPrivateMessage);
+        mSocket.off("chat message", this.onNewMessage);
+        mSocket.off("direct message", this.onPrivateMessage);
         mSocket.off("user joined", this.onUserJoined);
         mSocket.off("user left", this.onUserLeft);
         mSocket.off("typing", this.onTyping);
@@ -82,7 +82,7 @@ public class ChatFragment extends BaseFragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        this.mAdapter = new ChatAdapter(context, this.mItems);
+        this.mAdapter = new ChatMessageAdapter(this.mItems);
     }
 
     @Override
@@ -196,7 +196,7 @@ public class ChatFragment extends BaseFragment {
 
         // perform the sending message attempt
         addMessage(this.mDataBinding.getItem().getUsername(), message);
-        mSocket.emit("new message", message);
+        mSocket.emit("chat message", message);
 
         this.mDataBinding.inputMessage.setText("");
     }

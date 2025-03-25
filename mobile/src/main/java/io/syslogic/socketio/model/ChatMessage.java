@@ -9,19 +9,19 @@ public class ChatMessage extends BaseObservable {
     public static final int TYPE_LOG     = 1;
     public static final int TYPE_ACTION  = 2;
 
-    private int mType;
+    private Integer mType;
     private String mMessage;
     private String mUsername;
 
     ChatMessage() {}
 
-    public ChatMessage(int type, String message, String name) {
+    public ChatMessage(Integer type, String message, String name) {
         mType = type;
         mMessage = message;
         mUsername = name;
     }
 
-    public int getType() {
+    public Integer getType() {
         return this.mType;
     }
 
@@ -35,28 +35,34 @@ public class ChatMessage extends BaseObservable {
         return this.mUsername;
     }
 
+    /** Builder */
     public static class Builder {
 
-        private final int mType;
-        private String mUsername;
-        private String mMessage;
+        private Integer messageType;
+        private String username;
+        private String message;
 
-        public Builder(int type) {
-            mType = type;
+        public Builder(Integer messageType) {
+            this.messageType = messageType;
+        }
+
+        public Builder setMessageType(Integer value) {
+            this.messageType = value;
+            return this;
         }
 
         public Builder setUsername(String username) {
-            this.mUsername = username;
+            this.username = username;
             return this;
         }
 
         public Builder setMessage(String message) {
-            this.mMessage = message;
+            this.message = message;
             return this;
         }
 
         public ChatMessage build() {
-            return new ChatMessage(this.mType, this.mMessage,  this.mUsername);
+            return new ChatMessage(this.messageType, this.message,  this.username);
         }
     }
 }

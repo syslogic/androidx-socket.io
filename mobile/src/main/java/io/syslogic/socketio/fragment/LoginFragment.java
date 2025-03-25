@@ -110,7 +110,7 @@ public class LoginFragment extends BaseFragment {
         this.username = username;
         if (mSocket != null && mSocket.connected()) {
 
-            // add the emitter, before logging in.
+            // add the login emitter, before logging in.
             mSocket.on("login", this.onLogin);
             mSocket.emit("add user", username);
 
@@ -130,7 +130,7 @@ public class LoginFragment extends BaseFragment {
                 JSONObject item = data.getJSONObject(i);
                 String socketId = item.getString("socketId");
                 String username = item.getString("username");
-                items.add(new ChatUser.Builder().setSocketId(socketId).setUsername(username).build());
+                items.add(new ChatUser.Builder(0).setSocketId(socketId).setUsername(username).build());
             }
         } catch (JSONException e) {
             throw new RuntimeException(e);

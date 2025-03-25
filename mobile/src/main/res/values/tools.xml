@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="text_username">guest0815</string>
-    <string name="text_message">Test Message…</string>
-    <string name="text_socket_id">8DfKlzCmfF9XZNN6AAAj</string>
+    <string name="tools_text_username">guest0815</string>
+    <string name="tools_text_message">Test Message…</string>
+    <string name="tools_text_socket_id">8DfKlzCmfF9XZNN6AAAj</string>
 </resources>

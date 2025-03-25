@@ -31,7 +31,7 @@
                 android:layout_height="match_parent"
                 android:singleLine="false"
                 android:text='@{ item.username + ":" }'
-                tools:text="@string/text_username"/>
+                tools:text="@string/tools_text_username"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/message"
@@ -44,7 +44,7 @@
                 android:paddingRight="@dimen/message_padding"
                 android:singleLine="true"
                 android:text="@{ item.message }"
-                tools:text="@string/text_message"/>
+                tools:text="@string/tools_text_message"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

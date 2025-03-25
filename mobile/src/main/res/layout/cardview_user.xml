@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="item" type="io.syslogic.socketio.model.ChatMessage"/>
+        <variable name="item" type="io.syslogic.socketio.model.ChatUser"/>
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -24,14 +24,14 @@
             android:paddingEnd="@dimen/message_padding">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/message"
+                android:id="@+id/username"
                 style="?android:textAppearanceMedium"
                 android:textColor="?android:textColorSecondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="start"
-                android:text="@{ item.message }"
-                tools:text="@string/tools_text_message"/>
+                android:text="@{ item.username }"
+                tools:text="@string/tools_text_username"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
