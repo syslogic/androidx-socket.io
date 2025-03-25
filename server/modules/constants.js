@@ -8,6 +8,6 @@ module.exports = {
     USER_LOGIN:     "login",
     USER_JOINED:    "user joined",
     USER_LEFT:      "user left",
-    USER_ADD:       "add user",
+    USER_ADD:       "user add",
     SOCKETS:        "sockets"
 }

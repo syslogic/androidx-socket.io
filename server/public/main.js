@@ -62,7 +62,7 @@ $(function() {
       $inputMessage.focus();
 
       // Tell the server your username
-      socket.emit('add user', username);
+      socket.emit('user add', username);
     }
   }
 
@@ -311,7 +311,7 @@ $(function() {
   socket.on('reconnect', () => {
     log('you have been reconnected');
     if (username) {
-      socket.emit('add user', username);
+      socket.emit('user add', username);
     }
   });
 
