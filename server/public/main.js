@@ -1,34 +1,36 @@
+// noinspection JSUnresolvedReference
 $(function() {
-  var FADE_TIME = 150; // ms
-  var TYPING_TIMER_LENGTH = 400; // ms
-  var COLORS = [
+
+  const FADE_TIME = 150; // ms
+  const TYPING_TIMER_LENGTH = 400; // ms
+  const COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
     '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
 
   // Initialize variables
-  var $window = $(window);
-  var $usernameInput = $('.usernameInput'); // Input for username
-  var $messages = $('.messages');           // Messages area
-  var $inputMessage = $('.inputMessage');   // Input message input box
-  var $loginPage = $('.login.page');        // The login page
-  var $chatPage = $('.chat.page');          // The chatroom page
+  const $window = $(window);
+  const $usernameInput = $('.usernameInput'); // Input for username
+  const $messages = $('.messages');           // Messages area
+  const $inputMessage = $('.inputMessage');   // Input message input box
+  const $loginPage = $('.login.page');        // The login page
+  const $chatPage = $('.chat.page');          // The chatroom page
 
   // Prompt for setting a username
-  var username;
-  var connected = false;
-  var typing = false;
-  var lastTypingTime;
-  var $currentInput = $usernameInput.focus();
-  var socket = io();
+  let username;
+  let connected = false;
+  let typing = false;
+  let lastTypingTime;
+  let $currentInput = $usernameInput.focus();
+  const socket = io();
 
   const addParticipantsMessage = (data) => {
-    var message = '';
-    if (data.userCount === 1) {
-      message += "there's 1 participant";
+    let message = '';
+    if (data.usercount === 1) {
+      message += "There's 1 participant";
     } else {
-      message += "there are " + data.userCount + " participants";
+      message += "There are " + data.usercount + " participants";
     }
     log(message);
   }
@@ -51,7 +53,7 @@ $(function() {
 
   // Sends a chat message
   const sendMessage = () => {
-    var message = $inputMessage.val();
+    let message = $inputMessage.val();
     // Prevent markup from being injected into the message
     message = cleanInput(message);
     // if there is a non-empty message and a socket connection
@@ -68,31 +70,31 @@ $(function() {
 
   // Log a message
     const log = (message, options) => {
-    var $el = $('<li>').addClass('log').text(message);
-    addMessageElement($el, options);
+      const $el = $('<li>').addClass('log').text(message);
+      addMessageElement($el, options);
   }
 
   // Adds the visual chat message to the message list
   const addChatMessage = (data, options) => {
     // Don't fade the message in if there is an 'X was typing'
-    var $typingMessages = getTypingMessages(data);
+    const $typingMessages = getTypingMessages(data);
     options = options || {};
     if ($typingMessages.length !== 0) {
       options.fade = false;
       $typingMessages.remove();
     }
 
-    var $usernameDiv = $('<span class="username"/>')
-      .text(data.username)
-      .css('color', getUsernameColor(data.username));
-    var $messageBodyDiv = $('<span class="messageBody">')
-      .text(data.message);
+    const $usernameDiv = $('<span class="username"/>')
+        .text(data.username)
+        .css('color', getUsernameColor(data.username));
+    const $messageBodyDiv = $('<span class="messageBody">')
+        .text(data.message);
 
-    var typingClass = data.typing ? 'typing' : '';
-    var $messageDiv = $('<li class="message"/>')
-      .data('username', data.username)
-      .addClass(typingClass)
-      .append($usernameDiv, $messageBodyDiv);
+    const typingClass = data.typing ? 'typing' : '';
+    const $messageDiv = $('<li class="message"/>')
+        .data('username', data.username)
+        .addClass(typingClass)
+        .append($usernameDiv, $messageBodyDiv);
 
     addMessageElement($messageDiv, options);
   }
@@ -117,7 +119,7 @@ $(function() {
   // options.prepend - If the element should prepend
   //   all other messages (default = false)
   const addMessageElement = (el, options) => {
-    var $el = $(el);
+    const $el = $(el);
 
     // Setup default options
     if (!options) {
@@ -157,8 +159,8 @@ $(function() {
       lastTypingTime = (new Date()).getTime();
 
       setTimeout(() => {
-        var typingTimer = (new Date()).getTime();
-        var timeDiff = typingTimer - lastTypingTime;
+        const typingTimer = (new Date()).getTime();
+        const timeDiff = typingTimer - lastTypingTime;
         if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
           socket.emit('stop typing');
           typing = false;
@@ -169,7 +171,7 @@ $(function() {
 
   // Gets the 'X is typing' messages of a user
   const getTypingMessages = (data) => {
-    return $('.typing.message').filter(function (i) {
+    return $('.typing.message').filter(function(/* i */) {
       return $(this).data('username') === data.username;
     });
   }
@@ -177,19 +179,19 @@ $(function() {
   // Gets the color of a username through our hash function
   const getUsernameColor = (username) => {
     // Compute hash code
-    var hash = 7;
-    for (var i = 0; i < username.length; i++) {
+    let hash = 7;
+    for (let i = 0; i < username.length; i++) {
        hash = username.charCodeAt(i) + (hash << 5) - hash;
     }
     // Calculate color
-    var index = Math.abs(hash % COLORS.length);
+    const index = Math.abs(hash % COLORS.length);
     return COLORS[index];
   }
 
   // Keyboard events
 
   $window.keydown(event => {
-    // Auto-focus the current input when a key is typed
+    // Autofocus the current input when a key is typed
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
       $currentInput.focus();
     }
@@ -234,6 +236,11 @@ $(function() {
 
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', (data) => {
+    addChatMessage(data);
+  });
+
+  // TODO: Whenever the server emits 'private message', update the chat body
+  socket.on('private message', (data) => {
     addChatMessage(data);
   });
 
