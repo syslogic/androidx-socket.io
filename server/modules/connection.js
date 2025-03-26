@@ -1,6 +1,6 @@
 const constants = require("./constants");
 
-module.exports = (io, socket) => {
+module.exports = (socket) => {
 
     const onConnection = () => {
         // Store the remote connection in the socket session for the client

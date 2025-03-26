@@ -1,6 +1,6 @@
 const constants = require("./constants");
 
-module.exports = (io, socket) => {
+module.exports = (socket, io) => {
 
     const getSockets = () => {
         let data = [];

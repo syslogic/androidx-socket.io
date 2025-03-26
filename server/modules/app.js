@@ -17,10 +17,10 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
     socket.join('default');
-    require("./connection")(io, socket);
-    require("./message")(io, socket);
-    require("./user")(io, socket);
-    require("./typing")(io, socket);
+    require("./connection")(socket, io);
+    require("./message")(socket, io);
+    require("./user")(socket, io);
+    require("./typing")(socket, io);
 });
 
 module.exports = io;

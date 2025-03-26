@@ -1,6 +1,6 @@
 const constants = require("./constants");
 
-module.exports = (io, socket) => {
+module.exports = (socket) => {
 
     // When the client emits 'direct message'
     const onDirectMessage = (anotherSocketId, message) => {
