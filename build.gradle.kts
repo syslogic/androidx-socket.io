@@ -5,7 +5,3 @@ plugins {
     alias(libs.plugins.kotlin.android) apply(false)
     alias(libs.plugins.nodejs) apply(false)
 }
-
-// tasks.getByPath("mobile:assembleDebug").dependsOn(
-//     tasks.getByPath("server:startServer")
-// )

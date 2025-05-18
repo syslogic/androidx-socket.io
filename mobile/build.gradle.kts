@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.tasks.factory.dependsOn
-
 plugins {
     kotlin("android")
     alias(libs.plugins.android.application)
@@ -54,13 +52,9 @@ android {
 }
 
 dependencies {
-
-    implementation(libs.socket.io.client) {
-        // exclude(group = "org.json", module = "json")
-    }
-
     implementation(libs.material.design)
     implementation(libs.bundles.androidx)
+    implementation(libs.socket.io.client)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.bundles.androidx.test)
