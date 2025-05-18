@@ -15,7 +15,7 @@ plugins {
 
 node {
     version = "22.14.0"
-    npmVersion = "11.2.0"
+    npmVersion = "11.4.0"
     distBaseUrl = "https://nodejs.org/dist"
     download = true
 }
@@ -27,18 +27,11 @@ tasks.named("npm_update", NpmTask::class.java) {
 
 /** Configure NpmTask. */
 val npmRunBuildTask = tasks.named("npm_run_build", NpmTask::class.java) {
-    outputs.upToDateWhen { file("${projectDir}/build").exists() }
-    outputs.dir("build")
-
-    // npmCommand.set(listOf<String>("run", "build"))
-    // println(npmCommand.get().joinToString(", "))
-
-    // args.apply { listOf<String>("--loglevel=debug") }
-    // println(args.get().joinToString(", "))
-
     inputs.files(fileTree("public"))
     inputs.file("package.json")
     inputs.file("package-lock.json")
+    outputs.upToDateWhen { file("${projectDir}/build").exists() }
+    outputs.dir("build")
 }
 
 /** Package output of the build into JAR file. */
@@ -82,9 +75,9 @@ tasks.register("startServer", Exec::class.java) {
     errorOutput = stdErr
 
     if (os.isUnix || os.isLinux || os.isMacOsX) {
-        commandLine(path + "/start_server.sh")
+        commandLine("$path/start_server.sh")
     } else {
-        commandLine("cmd", "/c", "pwsh -File " + path + "/start_server.ps1")
+        commandLine("cmd", "/c", "pwsh -File $path/start_server.ps1")
     }
     doLast {
         if (executionResult.get().exitValue == 0) {
